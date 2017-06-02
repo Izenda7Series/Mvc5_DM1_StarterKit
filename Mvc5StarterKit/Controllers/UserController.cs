@@ -1,5 +1,4 @@
 ﻿using System.Web.Mvc;
-using Rhino.Licensing;
 using Microsoft.AspNet.Identity;
 
 namespace Mvc5StarterKit.Controllers
