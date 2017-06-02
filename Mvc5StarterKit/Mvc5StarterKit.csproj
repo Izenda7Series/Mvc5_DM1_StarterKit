@@ -45,30 +45,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.Logging">
-      <HintPath>IzendaReferences\Common.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Common.Logging.Core">
-      <HintPath>IzendaReferences\Common.Logging.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Dapper">
-      <HintPath>IzendaReferences\Dapper.dll</HintPath>
-    </Reference>
-    <Reference Include="DocumentFormat.OpenXml">
-      <HintPath>IzendaReferences\DocumentFormat.OpenXml.dll</HintPath>
-    </Reference>
-    <Reference Include="evohtmltopdf">
-      <HintPath>IzendaReferences\evohtmltopdf.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>IzendaReferences\HtmlAgilityPack.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlTags">
-      <HintPath>IzendaReferences\HtmlTags.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>IzendaReferences\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -77,40 +53,12 @@
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common">
       <HintPath>IzendaReferences\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation">
-      <HintPath>IzendaReferences\Microsoft.Practices.ServiceLocation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.TransientFaultHandling.Core">
-      <HintPath>IzendaReferences\Microsoft.Practices.TransientFaultHandling.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Practices.Unity">
       <HintPath>IzendaReferences\Microsoft.Practices.Unity.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration">
-      <HintPath>IzendaReferences\Microsoft.Practices.Unity.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Interception">
-      <HintPath>IzendaReferences\Microsoft.Practices.Unity.Interception.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Interception.Configuration">
-      <HintPath>IzendaReferences\Microsoft.Practices.Unity.Interception.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Nancy, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>IzendaReferences\Nancy.dll</HintPath>
-    </Reference>
-    <Reference Include="Nancy.Hosting.Aspnet">
-      <HintPath>IzendaReferences\Nancy.Hosting.Aspnet.dll</HintPath>
-    </Reference>
-    <Reference Include="Nancy.ViewEngines.Razor">
-      <HintPath>IzendaReferences\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Rhino.Licensing">
-      <HintPath>IzendaReferences\Rhino.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -262,6 +210,7 @@
     <Compile Include="IzendaBoundary\Models\RoleInfo.cs" />
     <Compile Include="IzendaBoundary\Models\TenantDetail.cs" />
     <Compile Include="IzendaBoundary\Models\UserDetail.cs" />
+    <Compile Include="IzendaBoundary\StringCipher.cs" />
     <Compile Include="IzendaBoundary\WebApiService.cs" />
     <Compile Include="IzendaConfig.cs" />
     <Compile Include="Managers\TenantManager.cs" />

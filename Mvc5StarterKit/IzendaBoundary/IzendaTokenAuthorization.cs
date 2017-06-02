@@ -1,16 +1,13 @@
 ﻿using Mvc5StarterKit.Models;
-using Rhino.Licensing;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Web;
 
 namespace Mvc5StarterKit.IzendaBoundary
 {
     public class IzendaTokenAuthorization
     {
         const string KEY = "THISISKEY";
+
         /// <summary>
         /// Generate token from UserInfo. Userinfo will be encrypted before sending to Izenda.
         /// </summary>
@@ -18,7 +15,7 @@ namespace Mvc5StarterKit.IzendaBoundary
         /// <returns></returns>
         public static string GetToken(UserInfo user)
         {
-            /// remove tenant property when sending token to Izenda, if Tenant is System.
+            // remove tenant property when sending token to Izenda, if Tenant is System.
             if (user.TenantUniqueName == "System")
                 user.TenantUniqueName = null;
 
