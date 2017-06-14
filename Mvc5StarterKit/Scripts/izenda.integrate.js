@@ -1,5 +1,5 @@
 ﻿var DoIzendaConfig = function () {
-    var hostApi = "http://localhost:9999/api/";
+    var hostApi = "http://localhost:5101/api/";
     var configJson = {
         "WebApiUrl": hostApi,
         "BaseUrl": "/izenda",
@@ -148,21 +148,6 @@ var izendaInitReport = function () {
 
 };
 
-//var izendaInitReportViewer = function () {
-//
-//    function successFunc(data, status) {
-//        var currentUserContext = {
-//            token: data.token
-//        };
-//
-//        IzendaSynergy.setCurrentUserContext(currentUserContext);
-//        IzendaSynergy.renderReportViewerPage(document.getElementById('izenda-root'), "C2946606-7159-4FB3-82B7-E7D4ED3162A0");
-//    }
-//
-//    this.DoRender(successFunc);
-//
-//};
-
 // Render report viewer to a <div> tag by report id
 var izendaInitReportViewer = function (reportId) {
     function successFunc(data, status) {
@@ -210,6 +195,19 @@ var izendaInitDashboard = function () {
 
     this.DoRender(successFunc);
 
+};
+
+// Render dashboard viewer to a <div> tag by dashboard id
+var izendaInitDashboardViewer = function (dashboardId) {
+    function successFunc(data, status) {
+        var currentUserContext = {
+            token: data.token
+        };
+        IzendaSynergy.setCurrentUserContext(currentUserContext);
+        IzendaSynergy.renderDashboardViewerPage(document.getElementById('izenda-root'), dashboardId);
+    }
+
+    this.DoRender(successFunc);
 };
 
 var izendaInitReportDesigner = function () {

@@ -46,7 +46,7 @@
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("New Report", "ReportDesigner", "Home")</li>
                                 <li>@Html.ActionLink("Report List", "Reports", "Home")</li>
-                                <li>@Html.ActionLink("Report1 Viewer", "ReportViewer", "Report", new { id = "58ec4bec-bb01-4c7a-b0b6-819a8439ea4b" }, null)</li>
+                                <li>@Html.ActionLink("Report1 Viewer", "ReportViewer", "Report", new { id = "[your report id]" }, null)</li>
                                 <li>@Html.ActionLink("Customized Report1 Filters Viewer", "ReportCustomFilterViewer", "Report")</li>
                                 <li>@Html.ActionLink("Report Parts", "ReportParts", "Report")</li>
                             </ul>
@@ -61,6 +61,7 @@
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("New Dashboard", "DashboardDesigner", "Home")</li>
                                 <li>@Html.ActionLink("Dashboard List", "Dashboards", "Home")</li>
+                                <li>@Html.ActionLink("Dashboard Viewer", "DashboardViewer", "Dashboard", new { id = "[your dashboard id]" }, null)</li>
                             </ul>
                         </li>
                     }
