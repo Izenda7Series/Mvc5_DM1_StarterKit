@@ -26,7 +26,7 @@ e.g. api/getAccessToken --> http://localhost:14809/api/getAccessToken
 
 ### Deploying the MVC Starter Kit Database
 
-- Run DBScripts/mvc5.sql to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script below to use the new database name.
+- Run DBScripts/mvc5.sql to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to use the new database name.
 
 ### Deploying the Retail Database (optional)
 
