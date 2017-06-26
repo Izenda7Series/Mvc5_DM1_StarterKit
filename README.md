@@ -65,46 +65,55 @@ Web.Config
 
 Initial User for logging in.
 
-System User:
-Tenant:
-Username: IzendaAdmin@system.com
-Password: Izenda@123
-DELDG:
-Employee Role:
-Tenant: DELDG
-Username: employee@deldg.com
-password: Izenda@123
-Manager Role:
-Tenant: DELDG
-Username: manager@deldg.com
-password: Izenda@123
-VP Role:
-Tenant: DELDG
-Username: vp@deldg.com
-password: Izenda@123
-NATWR
-Employee Role:
-Tenant: NATWR
-Username: employee@natwr.com
-password: Izenda@123
-Manager Role:
-Tenant: NATWR
-Username: manager@natwr.com
-password: Izenda@123
-VP Role:
-Tenant: NATWR
-Username: vp@natwr.com
-Password: Izenda@123
-RETCL
-Employee Role:
-Tenant: RETCL
-Username: employee@retcl.com
-password: Izenda@123
-Manager Role:
-Tenant: RETCL
-Username: manager@retcl.com
-password: Izenda@123
-VP Role:
-Tenant: RETCL
-Username: vp@retcl.com
-Password: Izenda@123
+System User: <br />
+- Tenant:
+- Username: IzendaAdmin@system.com <br />
+- Password: Izenda@123 <br />
+
+**DELDG**: <br />
+Employee Role: <br />
+- Tenant: DELDG
+- Username: employee@deldg.com
+- Password: Izenda@123
+
+Manager Role:<br />
+- Tenant: DELDG
+- Username: manager@deldg.com
+- Password: Izenda@123
+
+VP Role:<br />
+- Tenant: DELDG
+- Username: vp@deldg.com
+- Password: Izenda@123
+
+**NATWR** <br />
+Employee Role:<br />
+- Tenant: NATWR
+- Username: employee@natwr.com
+- Password: Izenda@123
+
+Manager Role:<br />
+- Tenant: NATWR
+- Username: manager@natwr.com
+- Password: Izenda@123
+
+VP Role:<br />
+- Tenant: NATWR
+- Username: vp@natwr.com
+- Password: Izenda@123
+
+**RETCL** <br />
+Employee Role:<br />
+- Tenant: RETCL
+- Username: employee@retcl.com
+- Password: Izenda@123
+
+Manager Role:<br />
+- Tenant: RETCL
+- Username: manager@retcl.com
+- Password: Izenda@123
+
+VP Role:<br />
+- Tenant: RETCL
+- Username: vp@retcl.com
+- Password: Izenda@123
