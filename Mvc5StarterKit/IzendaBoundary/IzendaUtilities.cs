@@ -46,7 +46,44 @@ namespace Mvc5StarterKit.IzendaBoundary
 
             return role;
         }
+        
+        /// <summary>
+        /// Adds the user to the Izenda database
+        /// See the link below for more details:
+        /// https://www.izenda.com/docs/ref/api_user.html?highlight=user%20integration#post-user-integration-saveuser
+        /// 
+        /// </summary>
+        /// <param name="appUser">the application user</param>
+        /// <param name="roleId">the role id</param>
+        /// <param name="authToken">the authentication token</param>
+        /// <returns>true if the operation was successful, false otherwise</returns>
+        public static async Task<bool> CreateIzendaUser(Mvc5StarterKit.Models.ApplicationUser appUser, string roleId, string authToken)
+        {    
+            var izendaTenant = appUser.Tenant != null ? await GetIzendaTenantByName(appUser.Tenant.Name, authToken) : null;
 
+            var izendaUser = new UserDetail
+            {
+                FirstName = izendaTenant != null ? izendaTenant.Name : string.Empty,
+                LastName = appUser.UserName.Split('@')[0],
+                Username = appUser.UserName,
+                TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
+                TenantId = izendaTenant != null ? (Guid?)izendaTenant.Id : null,
+                InitPassword = true,
+                Active = true
+            };
+
+            if (!string.IsNullOrWhiteSpace(roleId))
+            {
+                var izendaRole = await CreateRole(roleId, izendaTenant, authToken);
+                izendaUser.Roles.Add(izendaRole);
+            }
+
+            bool success = await WebApiService.Instance.PostReturnValueAsync<bool, UserDetail>("user/integration/saveUser", izendaUser, authToken);
+
+            return success;
+        }
+        
+        [Obsolete("This method is deprecated, please use CreateIzendaUser instead")]
         public static async Task<UserDetail> CreateUser(Mvc5StarterKit.Models.ApplicationUser hostingUser, string roleName, string authToken)
         {
             var izendaTenant = hostingUser.Tenant != null ? await GetIzendaTenantByName(hostingUser.Tenant.Name, authToken) : null;
