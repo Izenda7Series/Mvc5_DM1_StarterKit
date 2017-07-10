@@ -173,9 +173,12 @@ namespace Mvc5StarterKit.Controllers
                 //If role = "Employee" => add user to this role
 
                 string assignedRole = "Employee";
+                string assignedRoleId = "";
+                
                 if (RoleManager.RoleExists(assignedRole))
                 {
                     result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
+                    assignedRoleId = (RoleManager.FindByNameAsync(assignedRole)).Result.Id;
                 }
                 else
                 {
@@ -191,7 +194,9 @@ namespace Mvc5StarterKit.Controllers
                     if(tenant != null)
                         await IzendaBoundary.IzendaUtilities.CreateTenant(tenant.Name, izendaAdminAuthToken);
 
-                    await IzendaBoundary.IzendaUtilities.CreateUser(user, assignedRole, izendaAdminAuthToken);
+                    //CreateUser is Deprecated in favor of CreateIzendaUser
+                    //await IzendaBoundary.IzendaUtilities.CreateUser(user, assignedRole, izendaAdminAuthToken);
+                    await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRoleId, izendaAdminAuthToken);
 
                     /// end izenda
 
