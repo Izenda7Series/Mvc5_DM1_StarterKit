@@ -9,6 +9,7 @@ namespace Mvc5StarterKit.ApiControllers
     {
         [HttpGet]
         [Route("GenerateToken")]
+        //This is used for exporting only
         public string GenerateToken()
         {
             var username = User.Identity.GetUserName();
