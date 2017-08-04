@@ -30,7 +30,7 @@ namespace Mvc5StarterKit
 
             routes.MapRoute(
                 name: "DashboardViewer",
-                url: "dashboard/view/{id}",
+                url: "dashboard/edit/{id}",
                 defaults: new { controller = "Dashboard", action = "DashboardViewer" }
             );
 
