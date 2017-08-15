@@ -6,9 +6,9 @@
 
 /* Set padding to keep content from hitting the edges */
 .body-content {
+    height: 100%;
     padding-left: 15px;
     padding-right: 15px;
-    height: 100%;
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
@@ -27,7 +27,7 @@ textarea {
 
 .izenda-container {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     min-height: 100%;
     /*margin-top:50px;*/ /* This is a hack, need to fix*/
 }
