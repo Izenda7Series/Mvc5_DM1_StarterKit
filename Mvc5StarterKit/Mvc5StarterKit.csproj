@@ -248,13 +248,11 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="IzendaReferences\Rhino.Licensing.dll" />
     <Content Include="Scripts\alertify.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\izenda.integrate.js" />
     <Content Include="Scripts\izenda.utils.js" />
-    <None Include="Properties\PublishProfiles\mvc5_be_standalone.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -317,6 +315,7 @@
     <None Include="Views\Dashboard\DashboardViewer.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="IzendaReferences\" />
     <Folder Include="IzendaResources\" />
     <Folder Include="Scripts\izenda\" />
     <Folder Include="Views\User\" />
