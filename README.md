@@ -18,11 +18,9 @@ This Starterkit showcases how to embed the front-end of Izenda into a MVC5 appli
 
 - Download a copy of the <a href="https://github.com/Izenda7Series/Mvc5StarterKit/blob/master/Mvc5StarterKit/izendadb.config">izendadb.config</a> file and copy it to the root of your API deployment. Then modify the file with a valid connection string to this new database. If the connection string contains a ‘/’, ensure that you escape it ‘//’
 
-- In IzendaSystemSettings update AuthValidateAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/Account/validateIzendaAuthToken --> http://localhost:14809/api/Account/validateIzendaAuthToken
+- In IzendaSystemSettings update AuthValidateAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/account/validateIzendaAuthToken --> http://localhost:14809/api/account/validateIzendaAuthToken
 
-- In IzendaSystemSettings update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. 
-
-e.g. api/getAccessToken --> http://localhost:14809/api/getAccessToken
+- In IzendaSystemSettings update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/getAccessToken --> http://localhost:14809/api/GetIzendaAccessToken
 
 ### Deploying the MVC Starter Kit Database
 
