@@ -1,10 +1,12 @@
 # Izenda Mvc5Starterkit (Back-end Standalone)
 
- :warning: This kit has been recently migrated and we are still in the process of updating the documentation. If you require assistance, please contact Izenda Support.
- 
  
 ## Overview
 This Starterkit showcases how to embed the front-end of Izenda into a MVC5 application that uses a stand-alone API back-end.
+
+### Q. What is in this repository?
+
+### A. This is a simple example using a Visual Studio project template with Izenda Embedded into it. This repository is only an example of integrating Izenda into another application. The Visual Studio project template used in this scenario is used as a substitute for your application. This repository shows examples of how you might embed Izenda into your application.
 
  :warning: The MVC Kit is designed for demonstration purposes and should not be used as an “as-is” fully-integrated solution. You can use the kit for reference or a baseline but ensure that security and customization meet the standards of your company.
  
