@@ -2326,3 +2326,1665 @@ USE [master]
 GO
 ALTER DATABASE [mvc5_izenda] SET  READ_WRITE 
 GO
+
+-- ##################################
+-- Izenda Schema Migration Script From v1.25.0 To v2.4.4
+-- Database Type: [MSSQL] SQLServer
+-- ##################################
+
+
+-- ========================================================
+-- v1.25.1
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '1.25.1';
+
+
+-- ========================================================
+-- v1.25.2
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '1.25.2';
+
+
+-- ========================================================
+-- v1.25.3
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '1.25.3';
+
+
+-- ========================================================
+-- v1.25.4
+-- ========================================================
+-- Remove ar, fr languages
+DELETE IzendaLanguage WHERE Id = '15f7bd94-ae10-4fd7-91ed-cae10da3bd9d';
+
+DELETE IzendaLanguage WHERE Id = 'de80459f-cd0a-4443-93c4-a3f87eb0a78f';
+
+UPDATE IzendaDBVersion SET Version= '1.25.4';
+
+
+-- ========================================================
+-- v2.0.0
+-- ========================================================
+------ Table Report -----------------
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaReport' AND COLUMN_NAME='Params')
+BEGIN
+	ALTER TABLE IzendaReport ADD Params nvarchar (max) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaReport' AND COLUMN_NAME='Relationships')
+BEGIN
+	ALTER TABLE IzendaReport ADD Relationships nvarchar (max) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaReport' AND COLUMN_NAME='UsingFieldNames')
+BEGIN
+	ALTER TABLE IzendaReport ADD UsingFieldNames nvarchar (max) NULL
+END
+
+---------- Table IzendaReportDataSource --------------
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaReportDataSource' AND COLUMN_NAME='QuerySourceUniqueName')
+BEGIN
+	ALTER TABLE IzendaReportDataSource ADD QuerySourceUniqueName nvarchar (256) NULL
+END
+
+ALTER TABLE IzendaReportDataSource ALTER COLUMN QuerySourceId uniqueidentifier NULL
+
+------------- Table IzendaFilterField --------------------------
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaFilterField' AND COLUMN_NAME='QuerySourceUniqueName')
+BEGIN
+	ALTER TABLE IzendaFilterField ADD QuerySourceUniqueName nvarchar (256) NULL
+END
+
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaFilterField' AND COLUMN_NAME='QuerySourceFieldName')
+BEGIN
+	ALTER TABLE IzendaFilterField ADD QuerySourceFieldName nvarchar (256) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaFilterField' AND COLUMN_NAME='ComparisonFieldUniqueName')
+BEGIN
+	ALTER TABLE IzendaFilterField ADD ComparisonFieldUniqueName nvarchar (256) NULL
+END
+
+----------------------------------------------------------------
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaReport' AND COLUMN_NAME='IsGlobal')
+BEGIN
+	ALTER TABLE IzendaReport ADD IsGlobal bit NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaReportCategory' AND COLUMN_NAME='IsGlobal')
+BEGIN
+	ALTER TABLE IzendaReportCategory ADD IsGlobal bit NULL
+END
+
+GO
+
+Update IzendaReport SET IsGlobal ='0' WHERE IsGlobal IS NULL
+Update IzendaReportCategory SET IsGlobal ='0' WHERE IsGlobal IS NULL AND (Type = '0' OR Type ='1')
+
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaReportSetting' AND COLUMN_NAME='LocalCategoryName')
+BEGIN
+	ALTER TABLE IzendaReportSetting ADD LocalCategoryName nvarchar(256) NULL
+END
+
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaReportSetting' AND COLUMN_NAME='GlobalCategoryName')
+BEGIN
+	ALTER TABLE IzendaReportSetting ADD GlobalCategoryName nvarchar(256) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaDashboard' AND COLUMN_NAME='IsGlobal')
+BEGIN
+	ALTER TABLE IzendaDashboard ADD IsGlobal bit NULL
+END
+
+GO
+
+Update IzendaDashboard SET IsGlobal ='0' WHERE IsGlobal IS NULL
+Update IzendaReportCategory SET IsGlobal ='0' WHERE IsGlobal IS NULL AND Type = '2'
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaUserPermission' AND COLUMN_NAME='AssignedToNames')
+BEGIN
+	ALTER TABLE IzendaUserPermission ADD AssignedToNames nvarchar(max) NULL
+END
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[IzendaGlobalDatabaseMapping]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE [dbo].[IzendaGlobalDatabaseMapping]
+	(
+		[Id] [uniqueidentifier] PRIMARY KEY,
+		[FromServer] [nvarchar](256) NULL,
+		[ToServer] [nvarchar](256) NULL,
+		[FromDatabaseName] [nvarchar](256) NULL,
+		[Type] [int] NULL,
+		[FromObject] [nvarchar](256) NULL,
+		[ToDatabaseName] [nvarchar](256) NULL,
+		[ToObject] [nvarchar](256) NULL,
+		[SelectAllTenants] [bit] NULL,		
+		[TenantIds] [nvarchar](max) NULL,
+		[Version] [int] NULL,
+		[Deleted] [bit] NULL,
+		[Created] [datetime] NULL,
+		[CreatedBy] [nvarchar](256) NULL,
+		[Modified] [datetime] NULL,
+		[ModifiedBy] [nvarchar](256) NULL
+	)
+END
+
+IF EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData DROP CONSTRAINT PK_IzendaTemporaryData
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE  TABLE_NAME='IzendaTemporaryData' AND COLUMN_NAME='TenantId')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD TenantId uniqueidentifier NULL
+END
+
+-- Remove ar, fr languages
+DELETE IzendaLanguage WHERE Id = '15f7bd94-ae10-4fd7-91ed-cae10da3bd9d'
+
+DELETE IzendaLanguage WHERE Id = 'de80459f-cd0a-4443-93c4-a3f87eb0a78f'
+
+
+UPDATE IzendaDBVersion SET Version= '2.0.0';
+
+
+-- ========================================================
+-- v2.0.1
+-- ========================================================
+
+UPDATE IzendaDBVersion SET Version= '2.0.1';
+
+
+-- ========================================================
+-- v2.0.2
+-- ========================================================
+
+UPDATE IzendaDBVersion SET Version= '2.0.2';
+
+
+-- ========================================================
+-- v2.0.3
+-- ========================================================
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JointField_ForeignField' /* Index */
+	)
+	PRINT 'IX_Relationship_JointField_ForeignField exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JointField_ForeignField] ON [dbo].[IzendaRelationship]
+	(
+		[JoinFieldId] ASC,
+		[ForeignFieldId] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JQS_FQS_RPT_DEL_SR' /* Index */
+	)
+	PRINT 'IX_Relationship_JQS_FQS_RPT_DEL_SR exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JQS_FQS_RPT_DEL_SR] ON [dbo].[IzendaRelationship]
+	(
+		[JoinQuerySourceId] ASC,
+		[ForeignQuerySourceId] ASC,
+		[SystemRelationship] ASC,
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_Report_DEL' /* Index */
+	)
+	PRINT 'IX_Relationship_Report_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_Report_DEL] ON [dbo].[IzendaRelationship]
+	(
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Reletionship_Alias' /* Index */
+	)
+	PRINT 'IX_Reletionship_Alias exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Reletionship_Alias] ON [dbo].[IzendaRelationship]
+	(
+		[Alias] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Name_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Name_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Name_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[Name] ASC,
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportHistory' /* Table */
+        AND si.name='IX_ReportHistory_Modified_DEL' /* Index */
+	)
+	PRINT 'IX_ReportHistory_Modified_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportHistory_Modified_DEL] ON [dbo].[IzendaReportHistory]
+	(
+		[Modified] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportPart' /* Table */
+        AND si.name='IX_ReportPart_RPT' /* Index */
+	)
+	PRINT 'IX_ReportPart_RPT exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportPart_RPT] ON [dbo].[IzendaReportPart]
+	(
+		[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+UPDATE IzendaDBVersion SET Version= '2.0.3';
+
+
+-- ========================================================
+-- v2.0.4
+-- ========================================================
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JointField_ForeignField' /* Index */
+	)
+	PRINT 'IX_Relationship_JointField_ForeignField exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JointField_ForeignField] ON [dbo].[IzendaRelationship]
+	(
+		[JoinFieldId] ASC,
+		[ForeignFieldId] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JQS_FQS_RPT_DEL_SR' /* Index */
+	)
+	PRINT 'IX_Relationship_JQS_FQS_RPT_DEL_SR exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JQS_FQS_RPT_DEL_SR] ON [dbo].[IzendaRelationship]
+	(
+		[JoinQuerySourceId] ASC,
+		[ForeignQuerySourceId] ASC,
+		[SystemRelationship] ASC,
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_Report_DEL' /* Index */
+	)
+	PRINT 'IX_Relationship_Report_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_Report_DEL] ON [dbo].[IzendaRelationship]
+	(
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Reletionship_Alias' /* Index */
+	)
+	PRINT 'IX_Reletionship_Alias exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Reletionship_Alias] ON [dbo].[IzendaRelationship]
+	(
+		[Alias] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Name_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Name_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Name_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[Name] ASC,
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportHistory' /* Table */
+        AND si.name='IX_ReportHistory_Modified_DEL' /* Index */
+	)
+	PRINT 'IX_ReportHistory_Modified_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportHistory_Modified_DEL] ON [dbo].[IzendaReportHistory]
+	(
+		[Modified] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportPart' /* Table */
+        AND si.name='IX_ReportPart_RPT' /* Index */
+	)
+	PRINT 'IX_ReportPart_RPT exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportPart_RPT] ON [dbo].[IzendaReportPart]
+	(
+		[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+UPDATE IzendaDBVersion SET Version= '2.0.4';
+
+
+-- ========================================================
+-- v2.0.5
+-- ========================================================
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JointField_ForeignField' /* Index */
+	)
+	PRINT 'IX_Relationship_JointField_ForeignField exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JointField_ForeignField] ON [dbo].[IzendaRelationship]
+	(
+		[JoinFieldId] ASC,
+		[ForeignFieldId] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JQS_FQS_RPT_DEL_SR' /* Index */
+	)
+	PRINT 'IX_Relationship_JQS_FQS_RPT_DEL_SR exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JQS_FQS_RPT_DEL_SR] ON [dbo].[IzendaRelationship]
+	(
+		[JoinQuerySourceId] ASC,
+		[ForeignQuerySourceId] ASC,
+		[SystemRelationship] ASC,
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_Report_DEL' /* Index */
+	)
+	PRINT 'IX_Relationship_Report_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_Report_DEL] ON [dbo].[IzendaRelationship]
+	(
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Reletionship_Alias' /* Index */
+	)
+	PRINT 'IX_Reletionship_Alias exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Reletionship_Alias] ON [dbo].[IzendaRelationship]
+	(
+		[Alias] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Name_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Name_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Name_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[Name] ASC,
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportHistory' /* Table */
+        AND si.name='IX_ReportHistory_Modified_DEL' /* Index */
+	)
+	PRINT 'IX_ReportHistory_Modified_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportHistory_Modified_DEL] ON [dbo].[IzendaReportHistory]
+	(
+		[Modified] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportPart' /* Table */
+        AND si.name='IX_ReportPart_RPT' /* Index */
+	)
+	PRINT 'IX_ReportPart_RPT exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportPart_RPT] ON [dbo].[IzendaReportPart]
+	(
+		[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+UPDATE IzendaDBVersion SET Version= '2.0.5';
+
+
+-- ========================================================
+-- v2.0.6
+-- ========================================================
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JointField_ForeignField' /* Index */
+	)
+	PRINT 'IX_Relationship_JointField_ForeignField exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JointField_ForeignField] ON [dbo].[IzendaRelationship]
+	(
+		[JoinFieldId] ASC,
+		[ForeignFieldId] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JQS_FQS_RPT_DEL_SR' /* Index */
+	)
+	PRINT 'IX_Relationship_JQS_FQS_RPT_DEL_SR exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JQS_FQS_RPT_DEL_SR] ON [dbo].[IzendaRelationship]
+	(
+		[JoinQuerySourceId] ASC,
+		[ForeignQuerySourceId] ASC,
+		[SystemRelationship] ASC,
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_Report_DEL' /* Index */
+	)
+	PRINT 'IX_Relationship_Report_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_Report_DEL] ON [dbo].[IzendaRelationship]
+	(
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Reletionship_Alias' /* Index */
+	)
+	PRINT 'IX_Reletionship_Alias exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Reletionship_Alias] ON [dbo].[IzendaRelationship]
+	(
+		[Alias] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Name_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Name_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Name_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[Name] ASC,
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportHistory' /* Table */
+        AND si.name='IX_ReportHistory_Modified_DEL' /* Index */
+	)
+	PRINT 'IX_ReportHistory_Modified_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportHistory_Modified_DEL] ON [dbo].[IzendaReportHistory]
+	(
+		[Modified] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportPart' /* Table */
+        AND si.name='IX_ReportPart_RPT' /* Index */
+	)
+	PRINT 'IX_ReportPart_RPT exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportPart_RPT] ON [dbo].[IzendaReportPart]
+	(
+		[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+UPDATE IzendaDBVersion SET Version= '2.0.6';
+
+
+-- ========================================================
+-- v2.1.0
+-- ========================================================
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JointField_ForeignField' /* Index */
+	)
+	PRINT 'IX_Relationship_JointField_ForeignField exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JointField_ForeignField] ON [dbo].[IzendaRelationship]
+	(
+		[JoinFieldId] ASC,
+		[ForeignFieldId] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_JQS_FQS_RPT_DEL_SR' /* Index */
+	)
+	PRINT 'IX_Relationship_JQS_FQS_RPT_DEL_SR exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_JQS_FQS_RPT_DEL_SR] ON [dbo].[IzendaRelationship]
+	(
+		[JoinQuerySourceId] ASC,
+		[ForeignQuerySourceId] ASC,
+		[SystemRelationship] ASC,
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Relationship_Report_DEL' /* Index */
+	)
+	PRINT 'IX_Relationship_Report_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Relationship_Report_DEL] ON [dbo].[IzendaRelationship]
+	(
+		[ReportId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaRelationship' /* Table */
+        AND si.name='IX_Reletionship_Alias' /* Index */
+	)
+	PRINT 'IX_Reletionship_Alias exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Reletionship_Alias] ON [dbo].[IzendaRelationship]
+	(
+		[Alias] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Name_Category_SUB_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Name_Category_SUB_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Name_Category_SUB_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[Name] ASC,
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_Report_Tenant_Type_DEL' /* Index */
+	)
+	PRINT 'IX_Report_Tenant_Type_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Report_Tenant_Type_DEL] ON [dbo].[IzendaReport]
+	(
+		[TenantId] ASC,
+		[Type] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportHistory' /* Table */
+        AND si.name='IX_ReportHistory_Modified_DEL' /* Index */
+	)
+	PRINT 'IX_ReportHistory_Modified_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportHistory_Modified_DEL] ON [dbo].[IzendaReportHistory]
+	(
+		[Modified] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportPart' /* Table */
+        AND si.name='IX_ReportPart_RPT' /* Index */
+	)
+	PRINT 'IX_ReportPart_RPT exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_ReportPart_RPT] ON [dbo].[IzendaReportPart]
+	(
+		[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaQuerySourceField' /* Table */
+        AND si.name='IX_QuerySourceField_DeletedAndQuerySourceId' /* Index */
+	)
+	PRINT 'IX_QuerySourceField_DeletedAndQuerySourceId exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_QuerySourceField_DeletedAndQuerySourceId] ON [dbo].[IzendaQuerySourceField]
+	(
+		[Deleted] ASC,
+		QuerySourceId ASC		
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportHistory' /* Table */
+        AND si.name='IX_IzendaReportHistory' /* Index */
+	)
+	PRINT 'IX_IzendaReportHistory exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportHistory] ON [dbo].[IzendaReportHistory]
+	(
+		[Deleted] ASC,
+		[ReportID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource] ON [dbo].[IzendaReportDataSource]
+	(
+		[Deleted] ASC,
+		[ReportId] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReport' /* Table */
+        AND si.name='IX_IzendaReport' /* Index */
+	)
+	PRINT 'IX_IzendaReport exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReport] ON [dbo].[IzendaReport]
+	(
+		[Deleted] ASC,
+		[Id] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaUser' /* Table */
+        AND si.name='IX_IzendaUser' /* Index */
+	)
+	PRINT 'IX_IzendaUser exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaUser] ON [dbo].[IzendaUser]
+	(
+		[Deleted] ASC,
+		[Username] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaReportCategory' AND COLUMN_NAME='CreatedById')
+BEGIN
+	ALTER TABLE IzendaReportCategory ADD CreatedById uniqueidentifier NULL
+END
+
+UPDATE IzendaDBVersion SET Version= '2.1.0';
+
+
+-- ========================================================
+-- v2.1.1
+-- ========================================================
+
+UPDATE IzendaDBVersion SET Version= '2.1.1';
+
+
+-- ========================================================
+-- v2.1.2
+-- ========================================================
+
+UPDATE IzendaDBVersion SET Version= '2.1.2';
+
+
+-- ========================================================
+-- v2.1.3
+-- ========================================================
+
+UPDATE IzendaFilterOperator SET AllowParameter=1 WHERE Id IN ('496BE89B-305A-4B5E-A361-C2CC8124DC69',
+'F7E3CEF8-5B60-4A72-87C7-CCA6452A4C31')
+
+UPDATE IzendaDBVersion SET Version= '2.1.3';
+
+
+-- ========================================================
+-- v2.1.4
+-- ========================================================
+
+UPDATE IzendaFilterOperator SET AllowParameter=1 WHERE Id IN ('496BE89B-305A-4B5E-A361-C2CC8124DC69',
+'F7E3CEF8-5B60-4A72-87C7-CCA6452A4C31')
+
+UPDATE IzendaDBVersion SET Version= '2.1.4';
+
+
+-- ========================================================
+-- v2.1.5
+-- ========================================================
+
+UPDATE IzendaFilterOperator SET AllowParameter=1 WHERE Id IN ('496BE89B-305A-4B5E-A361-C2CC8124DC69',
+'F7E3CEF8-5B60-4A72-87C7-CCA6452A4C31')
+
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '852A16E9-BCFF-42F4-95B4-CEE36342887B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('852A16E9-BCFF-42F4-95B4-CEE36342887B','RollbackSPWhenLoadSchema','1','0')
+END
+
+UPDATE IzendaDBVersion SET Version= '2.1.5';
+
+
+-- ========================================================
+-- v2.2.0
+-- ========================================================
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaDashboard' /* Table */
+        AND si.name='IX_Dashboard_Category_SUB_Tenant_DEL' /* Index */
+	)
+	PRINT 'IX_Dashboard_Category_SUB_Tenant_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Dashboard_Category_SUB_Tenant_DEL] ON [dbo].[IzendaDashboard]
+	(
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaDashboard' /* Table */
+        AND si.name='IX_Dashboard_Name_Category_SUB_Tenant_DEL' /* Index */
+	)
+	PRINT 'IX_Dashboard_Name_Category_SUB_Tenant_DEL exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_Dashboard_Name_Category_SUB_Tenant_DEL] ON [dbo].[IzendaDashboard]
+	(
+		[Name] ASC,
+		[CategoryId] ASC,
+		[SubCategoryId] ASC,
+		[TenantId] ASC,
+		[Deleted] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaConnection' AND COLUMN_NAME='ServerTypeName')
+BEGIN
+	ALTER TABLE IzendaConnection ADD ServerTypeName nvarchar(256) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaConnection' AND COLUMN_NAME='DatabaseName')
+BEGIN
+	ALTER TABLE IzendaConnection ADD DatabaseName nvarchar(256) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaConnection' AND COLUMN_NAME='DatabaseServer')
+BEGIN
+	ALTER TABLE IzendaConnection ADD DatabaseServer nvarchar(256) NULL
+END
+
+UPDATE IzendaFilterOperator SET AllowParameter=1 WHERE Id IN ('496BE89B-305A-4B5E-A361-C2CC8124DC69',
+'F7E3CEF8-5B60-4A72-87C7-CCA6452A4C31')
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '852A16E9-BCFF-42F4-95B4-CEE36342887B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('852A16E9-BCFF-42F4-95B4-CEE36342887B','RollbackSPWhenLoadSchema','1','0')
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaFilterField' AND COLUMN_NAME='IsNegative')
+BEGIN
+	ALTER TABLE IzendaFilterField ADD IsNegative bit NULL
+END
+
+UPDATE IzendaDBVersion SET Version= '2.2.0';
+
+
+
+
+
+-- ========================================================
+-- v2.2.1
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.2.1';
+
+
+
+-- ========================================================
+-- v2.2.2
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.2.2';
+
+
+
+-- ========================================================
+-- v2.2.3
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.2.3';
+
+
+
+-- ========================================================
+-- v2.2.4
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.2.4';
+
+
+
+-- ========================================================
+-- v2.2.5
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.2.5';
+
+
+
+-- ========================================================
+-- v2.2.6
+-- ========================================================
+UPDATE IzendaQuerySourceField SET AllowDistinct = '1' WHERE AllowDistinct = '0' AND IzendaDataType IN ('Text', 'Datetime', 'Money', 'Boolean', 'Time', 'Numeric')
+
+UPDATE IzendaDBVersion SET Version= '2.2.6';
+
+
+
+-- ========================================================
+-- v2.3.0
+-- ========================================================
+--IzendaFilterOperator
+-- FilterOperatorGroup: '...'
+
+IF (OBJECT_ID('FK_IzendaFilterField_IzendaFilterOperator', 'F') IS NOT NULL)
+BEGIN
+    ALTER TABLE IzendaFilterField DROP CONSTRAINT FK_IzendaFilterField_IzendaFilterOperator
+END
+
+DELETE FROM IzendaFilterOperator;
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('1476ed4b-17ac-4e39-be1b-0a25f705ebea','...','','95051abc-70eb-4908-8d13-04032aab3c66', 1, 0, '0');
+
+-- FilterOperatorGroup: 'Comparison'
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('f8a69ec3-bc01-40fd-8dc1-0b7a259ee83e','...','','08b322e2-ac79-406d-8367-046437b4fcd9',20,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('6bac46ba-768f-4764-9109-0bc2736bcbfd','Blank','=','08b322e2-ac79-406d-8367-046437b4fcd9',30,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('ce0fda8a-4515-409c-9d00-0bf56c2b4c4d','Not Blank','=','08b322e2-ac79-406d-8367-046437b4fcd9',40,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('f15ff59e-837b-415b-9191-4392944f3ad4','Null','=','08b322e2-ac79-406d-8367-046437b4fcd9',41,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('588c8b41-afa5-45e7-9a00-188125fa20b1','Not Null','=','08b322e2-ac79-406d-8367-046437b4fcd9',42,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('b78305b3-70f4-4724-a02c-1617a0ef95d3','Is Less Than','<','08b322e2-ac79-406d-8367-046437b4fcd9',50,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('53d73892-3a12-45cd-8b69-163ff6c41989','Is Greater Than','>','08b322e2-ac79-406d-8367-046437b4fcd9',60,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('94c4fb2e-c5d3-4160-a2f7-173418ca4e66','Between','Between','08b322e2-ac79-406d-8367-046437b4fcd9',70,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('9fe2afd6-8fb6-4a34-b2e2-1822323af768','Not Less Than','>=','08b322e2-ac79-406d-8367-046437b4fcd9',80,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('0526507d-901b-4d41-8c4b-1831f90b180c','Not Greater Than','<=','08b322e2-ac79-406d-8367-046437b4fcd9',90,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('6ea8396b-49e3-4ed2-b9b6-18c1a737cffc','Not Between','Not Between','08b322e2-ac79-406d-8367-046437b4fcd9',100,0, '0');
+
+-- FilterOperatorGroup: 'Equivalence'
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('0f043b65-e45d-4c22-9634-0da9e96493bc','...','','e023c1f4-42b3-469b-a8d9-04684feeb4ed',110,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('d7096bd5-09e5-433d-924e-0e038bdc81fb','Blank','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',120,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('85252e31-7588-438f-85ff-0e0e9c16df8d','Not Blank','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',130,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('ae1af3eb-d1cc-4c27-90e3-97a2903581fc','Null','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',131,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('6383bdd3-73bd-4c0f-97c7-f41553b3d5da','Not Null','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',132,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('737307d1-1e5f-407f-889f-1b3c9a66dd6f','Equals (Manual Entry)','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',140,1, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('042a04a3-dfe1-4ef9-bd27-1b657886f02e','Equals (Selection)','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',150,1, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('bb2f8e2d-753e-4fc9-9646-1b977a043b9a','Equals (Popup)','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',160,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('003c0e13-cc3c-412f-8fee-1cf21aa51e31','Equals (Tree)','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',170,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('5ce630bc-6615-42c4-b11e-1d09c651eaae','Equals (Checkbox)','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',180,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('78ba4663-e8a4-407f-bab2-1dc014a4df56','Not Equal (Manual Entry)','<>','e023c1f4-42b3-469b-a8d9-04684feeb4ed',190,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('75fcf433-81f2-4767-94b7-1e4257b826c4','Not Equal (Selection)','<>','e023c1f4-42b3-469b-a8d9-04684feeb4ed',200,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('5cdacf39-8eed-4ed3-8684-1e4461e85e1b','Not Equal (Popup)','<>','e023c1f4-42b3-469b-a8d9-04684feeb4ed',210,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('de9ab97b-4e57-4c8c-8415-1e5030415b50','Not Equal (Checkbox)','<>','e023c1f4-42b3-469b-a8d9-04684feeb4ed',220,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('6bc89182-aa4c-4fa5-b151-208af7e8cd59','Not Equal (Tree)','<>','e023c1f4-42b3-469b-a8d9-04684feeb4ed',230,0, '0');
+
+-- FilterOperatorGroup: 'Field Comparison'
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('444b32e1-5ba5-4829-a8dc-0e3a0e6a69f3','...','','6938e8a8-c810-4044-be0b-05709faa4734',240,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('83849954-987f-4213-b5b3-0febf0251d5c','Blank','=','6938e8a8-c810-4044-be0b-05709faa4734',250,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('38a333fb-39cf-424c-bbaf-1043600ca055','Not Blank','=','6938e8a8-c810-4044-be0b-05709faa4734',260,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('12d4c133-96dd-422c-90c7-1b0e02e0bdc1','Null','=','6938e8a8-c810-4044-be0b-05709faa4734',261,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('ed9b3b36-26fc-4b2b-a696-2d5a4322427e','Not Null','=','6938e8a8-c810-4044-be0b-05709faa4734',262,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('c506759f-c000-46c3-a35a-21b7d5bbd447','Is Less Than (Field)','<','6938e8a8-c810-4044-be0b-05709faa4734',270,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('de669d47-d040-494c-91d9-21df45009964','Is Greater Than (Field)','>','6938e8a8-c810-4044-be0b-05709faa4734',280,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('ecd32d5d-32ce-493e-8f9f-225647357325','Equals (Field)','=','6938e8a8-c810-4044-be0b-05709faa4734',290,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('1e9fbb61-8a77-48a6-b95e-2357646360a5','Not Equal (Field)','<>','6938e8a8-c810-4044-be0b-05709faa4734',300,0, '0');
+	
+-- FilterOperatorGroup: 'Date & Time'	
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('27a17b83-4b6a-4700-91a7-10558ef6ab23','...','','01076b28-8e77-4a54-95d8-060d142a77e6',310,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('98e2ec4a-f34f-4bf1-b2b2-108fbec8fa5b','Blank','=','01076b28-8e77-4a54-95d8-060d142a77e6',320,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('63f26c6a-f763-4947-8517-10fd79de5e2a','Not Blank','=','01076b28-8e77-4a54-95d8-060d142a77e6',330,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('ab2712b7-5016-448f-88cb-422848d22424','Null','=','01076b28-8e77-4a54-95d8-060d142a77e6',331,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('c3344c6c-3dd1-40d7-a68e-70dd9e89001a','Not Null','=','01076b28-8e77-4a54-95d8-060d142a77e6',332,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('26f4e86e-26cb-497a-98c0-bc194bc785ac','Between (Date)','Between (Date)','01076b28-8e77-4a54-95d8-060d142a77e6',340,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('78376aea-4d3c-4e8d-ab97-25c6c249be62','Between (Date & Time)','Between (Date & Time)','01076b28-8e77-4a54-95d8-060d142a77e6',350,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('3f2378bd-4470-48f8-b951-6ca0ff2baac7','Between (Time)','Between (Time)','01076b28-8e77-4a54-95d8-060d142a77e6',360,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('e830fbc3-cb92-4251-ad9f-3a84fd99fcb2','Not Between (Date)','Not Between (Date)','01076b28-8e77-4a54-95d8-060d142a77e6',370,0, 0);
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('5522a5d7-0456-432b-b1fb-02a4283baa3d','Not Between (Date & Time)','Not Between (Date & Time)','01076b28-8e77-4a54-95d8-060d142a77e6',380,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('b8f665e9-9753-4716-9d6e-688df6dccae4','Not Between (Time)','Not Between (Time)','01076b28-8e77-4a54-95d8-060d142a77e6',390,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('496be89b-305a-4b5e-a361-c2cc8124dc69','Equals (Date)','=','01076b28-8e77-4a54-95d8-060d142a77e6',400,1, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('cb64b1fd-6dec-4b18-b348-02b5b984e6c6','Equals (Date & Time)','=','01076b28-8e77-4a54-95d8-060d142a77e6',410,1, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('f7e3cef8-5b60-4a72-87c7-cca6452a4c31','Equals (Time)','=','01076b28-8e77-4a54-95d8-060d142a77e6',420,1, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('fbd954e2-bebf-4892-9b90-4134fce1f6dc','Not Equal (Date)','<>','01076b28-8e77-4a54-95d8-060d142a77e6',430,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('4d68d4a2-05ac-4f24-8496-02c1cfe75460','Not Equal (Date & Time)','<>','01076b28-8e77-4a54-95d8-060d142a77e6',440,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('ec661dc4-12bf-4ce8-8691-cb2bd94c7888','Not Equal (Time)','<>','01076b28-8e77-4a54-95d8-060d142a77e6',450,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('f6b2f9d3-464d-4399-bfd2-265009d3fcf1','In Time Period','=','01076b28-8e77-4a54-95d8-060d142a77e6',460,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('05f7ea30-001d-4779-ad3b-2732ed97d61e','Less Than Days Old','<','01076b28-8e77-4a54-95d8-060d142a77e6',470,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('1c6b9fbd-6377-4c8b-9acc-286ff0e853c5','Greater Than Days Old','>','01076b28-8e77-4a54-95d8-060d142a77e6',480,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('a8d45242-f5f0-4839-ae98-287ddc178c96','Equals Days Old','=','01076b28-8e77-4a54-95d8-060d142a77e6',490,0, '0');
+
+-- FilterOperatorGroup: 'String'
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('97040a0e-7c33-4088-90ac-1146428428df','...','','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',500,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('c16bc286-3238-4a36-85e5-123eb989bee8','Blank','=','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',510,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('966019de-d541-4ee4-9235-125732abb75a','Not Blank','=','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',520,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('e62a6e5b-b25c-4567-8a5a-0d42ee223de3','Null','=','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',521,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('fb22a60c-72b1-4f3b-bdca-dfab8402fc80','Not Null','=','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',522,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('3396325a-4233-4180-8513-2bb991627800','Like','Like','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',530,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('0ac3a76f-cf80-4cd7-8cfd-2c74fadb330a','Begins With','Begins With','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',540,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('09b9b1ba-21c5-4f05-808c-2cae6cca56d9','Ends With','Ends With','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',550,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('30dd377c-5217-4665-8896-2d61efc73cfc','Not Like','Not Like','c1b10232-6c6f-4bd5-91a1-09317a2b2e67',560,0, '0');
+
+-- FilterOperatorGroup: 'Boolean'
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('a52e09eb-8867-45e5-88bc-12ba9434f16f','...','','7b127c0c-4996-4df8-aa72-09cf07569f5e',570,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('c77e5ab6-890d-4bf6-8773-13cc9c3bf67e','Blank','=','7b127c0c-4996-4df8-aa72-09cf07569f5e',580,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('a8339c19-7b65-4ee7-8ef4-13e340fba2e9','Not Blank','=','7b127c0c-4996-4df8-aa72-09cf07569f5e',590,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('bcf08dfe-ea7c-4eee-bb91-4217d2bf67db','Null','=','7b127c0c-4996-4df8-aa72-09cf07569f5e',591,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('30467a1f-b54a-4d1a-a7ef-fde70e4c5274','Not Null','=','7b127c0c-4996-4df8-aa72-09cf07569f5e',592,0, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('31d3e116-bde2-40d1-b259-2d750348299c','True','=','7b127c0c-4996-4df8-aa72-09cf07569f5e',600,1, '0');
+
+INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('086dc2fc-23e3-4b54-bc46-2e5f572d2d3f','False','=','7b127c0c-4996-4df8-aa72-09cf07569f5e',610,1, '0');
+
+--IzendaFilterOperatorRule
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'f15ff59e-837b-415b-9191-4392944f3ad4';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = '588c8b41-afa5-45e7-9a00-188125fa20b1';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'ae1af3eb-d1cc-4c27-90e3-97a2903581fc';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = '6383bdd3-73bd-4c0f-97c7-f41553b3d5da';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = '12d4c133-96dd-422c-90c7-1b0e02e0bdc1';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'ed9b3b36-26fc-4b2b-a696-2d5a4322427e';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'ab2712b7-5016-448f-88cb-422848d22424';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'c3344c6c-3dd1-40d7-a68e-70dd9e89001a';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'e62a6e5b-b25c-4567-8a5a-0d42ee223de3';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'fb22a60c-72b1-4f3b-bdca-dfab8402fc80';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = 'bcf08dfe-ea7c-4eee-bb91-4217d2bf67db';
+
+DELETE FROM IzendaFilterOperatorRule WHERE Id = '30467a1f-b54a-4d1a-a7ef-fde70e4c5274';
+
+	-- Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('f15ff59e-837b-415b-9191-4392944f3ad4', 'f15ff59e-837b-415b-9191-4392944f3ad4', 1, 0, '0');
+	-- Not Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('588c8b41-afa5-45e7-9a00-188125fa20b1', '588c8b41-afa5-45e7-9a00-188125fa20b1', 1, 0, '0');
+
+	-- Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('ae1af3eb-d1cc-4c27-90e3-97a2903581fc', 'ae1af3eb-d1cc-4c27-90e3-97a2903581fc', 1, 0, '0');
+	-- Not Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('6383bdd3-73bd-4c0f-97c7-f41553b3d5da', '6383bdd3-73bd-4c0f-97c7-f41553b3d5da', 1, 0, '0');
+
+	-- Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('12d4c133-96dd-422c-90c7-1b0e02e0bdc1', '12d4c133-96dd-422c-90c7-1b0e02e0bdc1', 1, 0, '0');
+	-- Not Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('ed9b3b36-26fc-4b2b-a696-2d5a4322427e', 'ed9b3b36-26fc-4b2b-a696-2d5a4322427e', 1, 0, '0');
+
+	-- Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('ab2712b7-5016-448f-88cb-422848d22424', 'ab2712b7-5016-448f-88cb-422848d22424', 1, 0, '0');
+	-- Not Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('c3344c6c-3dd1-40d7-a68e-70dd9e89001a', 'c3344c6c-3dd1-40d7-a68e-70dd9e89001a', 1, 0, '0');
+
+	-- Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('e62a6e5b-b25c-4567-8a5a-0d42ee223de3', 'e62a6e5b-b25c-4567-8a5a-0d42ee223de3', 1, 0, '0');
+	-- Not Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('fb22a60c-72b1-4f3b-bdca-dfab8402fc80', 'fb22a60c-72b1-4f3b-bdca-dfab8402fc80', 1, 0, '0');
+
+	-- Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('bcf08dfe-ea7c-4eee-bb91-4217d2bf67db', 'bcf08dfe-ea7c-4eee-bb91-4217d2bf67db', 1, 0, '0');
+	-- Not Null
+INSERT INTO IzendaFilterOperatorRule(Id, OperatorId, AllowNull, IsPairedValues, Deleted) VALUES ('30467a1f-b54a-4d1a-a7ef-fde70e4c5274', '30467a1f-b54a-4d1a-a7ef-fde70e4c5274', 1, 0, '0');
+
+	-- Update old data of AllowDistinct field
+UPDATE IzendaQuerySourceField SET AllowDistinct = '1' WHERE AllowDistinct = '0' AND IzendaDataType IN ('Text', 'Datetime', 'Money', 'Boolean', 'Time', 'Numeric');
+
+	-- Update old data of ComparisonOperator in tables: IzendaRelationship, IzendaRelationshipKeyJoin
+UPDATE IzendaRelationship SET ComparisonOperator = '= (Field)' WHERE ComparisonOperator IS NULL;
+
+UPDATE IzendaRelationshipKeyJoin SET ComparisonOperator = '= (Field)' WHERE ComparisonOperator IS NULL AND ComparisonValue IS NULL;
+
+UPDATE IzendaRelationshipKeyJoin SET ComparisonOperator = '=' WHERE ComparisonOperator IS NULL AND ComparisonValue IS NOT NULL;
+
+UPDATE IzendaDBVersion SET Version= '2.3.0';
+
+
+
+-- ========================================================
+-- v2.3.1
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.3.1';
+
+
+-- ========================================================
+-- v2.3.2
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.3.2';
+
+
+-- ========================================================
+-- v2.3.3
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.3.3';
+
+
+-- ========================================================
+-- v2.3.4
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.3.4';
+
+
+-- ========================================================
+-- v2.3.5
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.3.5';
+
+
+-- ========================================================
+-- v2.4.0
+-- ========================================================
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaQuerySource' AND COLUMN_NAME='CustomDefinition')
+BEGIN
+	ALTER TABLE IzendaQuerySource ADD CustomDefinition nvarchar(max) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaQuerySource' AND COLUMN_NAME='Disabled')
+BEGIN
+	ALTER TABLE IzendaQuerySource ADD Disabled bit NULL
+END
+
+GO
+
+UPDATE IzendaQuerySource SET Disabled = 0 WHERE Disabled IS NULL;
+
+ALTER TABLE IzendaQuerySourceField ALTER COLUMN Expression NVARCHAR(MAX);
+
+
+UPDATE IzendaDBVersion SET Version= '2.4.0';
+
+
+-- ========================================================
+-- v2.4.1
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.4.1';
+
+
+-- ========================================================
+-- v2.4.2
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.4.2';
+
+
+-- ========================================================
+-- v2.4.3
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.4.3';
+
+
+-- ========================================================
+-- v2.4.4
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.4.4';
+
