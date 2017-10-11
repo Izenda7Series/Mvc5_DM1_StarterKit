@@ -18,13 +18,6 @@
     white-space: normal;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
-}
-
 .izenda-container {
     width: 100%;
     height: 100vh;
@@ -92,4 +85,45 @@ textarea {
 @media print {
     .loader { display: none !important; }
     #loader { display: none !important; }
+}
+
+/*Input for account info in login, register page*/
+.account-info input {
+    max-width: 280px;
+}
+
+/*Report parts*/
+.report-part-haft-width {
+    float: left;
+    width: 40%;
+    height: 40%;
+    margin-left: 5%;
+    margin-top: 5%;
+}
+
+.report-part-fullwidth {
+    float: left;
+    width: 85%;
+    height: 40%;
+    margin-left: 5%;
+    margin-top: 5%;
+}
+
+.report-part-container {
+    height: 50vh;
+    margin-top: 10px;
+}
+
+
+.pvalue-control {
+    width: 300px;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #555555;
+    vertical-align: middle;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
 }
