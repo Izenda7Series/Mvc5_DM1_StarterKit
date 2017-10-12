@@ -104,6 +104,7 @@ var izendaInitSetting = function () {
 //
 //    this.DoRender(successFunc);
 //};
+
 var izendaInitReportPart = function (reportParts) {
 
     function successFunc(data, status) {
@@ -132,6 +133,40 @@ var izendaInitReportPart = function (reportParts) {
     this.DoRender(successFunc);
 };
 
+var izendaInitReportPartUpdateResult = function (reportPartId, overridingFilterValue, container) {
+
+    function successFunc(data, status) {
+        console.info(data);
+        var currentUserContext = {
+            token: data.token
+        };
+
+        IzendaSynergy.setCurrentUserContext(currentUserContext);
+        IzendaSynergy.renderReportPart(document.getElementById(container), {
+            "id": reportPartId,
+            "overridingFilterValue": overridingFilterValue,
+        });
+    }
+
+    this.DoRender(successFunc);
+};
+
+var izendaRenderReportPart = function (reportPartId, container) {
+
+    function successFunc(data, status) {
+        console.info(data);
+        var currentUserContext = {
+            token: data.token
+        };
+
+        IzendaSynergy.setCurrentUserContext(currentUserContext);
+        IzendaSynergy.renderReportPart(document.getElementById(container), {
+            "id": reportPartId
+        });
+    }
+
+    this.DoRender(successFunc);
+};
 
 var izendaInitReport = function () {
 
@@ -240,7 +275,6 @@ var izendaInitNewDashboard = function () {
     this.DoRender(successFunc);
 
 };
-
 
 var izendaInitReportPartExportViewer = function (reportPartId, token) {
     var currentUserContext = {
