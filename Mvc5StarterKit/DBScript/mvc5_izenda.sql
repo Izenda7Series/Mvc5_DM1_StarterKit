@@ -3990,3 +3990,3410 @@ UPDATE IzendaDBVersion SET Version= '2.4.3';
 -- ========================================================
 UPDATE IzendaDBVersion SET Version= '2.4.4';
 
+-- ##################################
+-- Izenda Schema Migration Script From v2.4.4 To v2.6.20
+-- Database Type: [MSSQL] SQLServer
+-- ##################################
+
+
+-- ========================================================
+-- v2.5.0
+-- ========================================================
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaQuerySourceField' AND COLUMN_NAME='IsRunningField')
+BEGIN
+	ALTER TABLE IzendaQuerySourceField ADD IsRunningField bit NULL
+END
+
+IF NOT EXISTS (SELECT * FROM IzendaFilterOperator WHERE Id = '5b654e75-d293-4e7e-9102-cdb74286e717')
+BEGIN
+    INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('5b654e75-d293-4e7e-9102-cdb74286e717','Equals (Manual Entry No Auto-Complete)','=','e023c1f4-42b3-469b-a8d9-04684feeb4ed',145,1, '0');
+END
+IF NOT EXISTS (SELECT * FROM IzendaFilterOperator WHERE Id = 'eca0a47d-cba9-406e-8c8c-9fb48314e685')
+BEGIN
+    INSERT INTO IzendaFilterOperator(Id, Name, Label, OperatorGroupId, Position, AllowParameter, Deleted)VALUES('eca0a47d-cba9-406e-8c8c-9fb48314e685','Not Equal (Manual Entry No Auto-Complete)','<>','e023c1f4-42b3-469b-a8d9-04684feeb4ed',195,0, '0');
+END
+
+UPDATE IzendaDBVersion SET Version= '2.5.0';
+
+
+-- ========================================================
+-- v2.5.1
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.5.1';
+
+
+-- ========================================================
+-- v2.5.2
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.5.2';
+
+
+-- ========================================================
+-- v2.5.3
+-- ========================================================
+UPDATE IzendaDBVersion SET Version= '2.5.3';
+
+
+-- ========================================================
+-- v2.6.0
+-- ========================================================
+UPDATE IzendaExportMarginDefaultValue SET LeftValue = '7.77', RightValue ='7.77' WHERE Id = 'DF2D2380-48C9-4249-AACB-8FD3A3465606';
+
+IF NOT EXISTS (SELECT * FROM [IzendaExportMarginDefaultValue] WHERE Id = 'DF2D2380-48C9-4249-AACB-8FD3A3465607')
+BEGIN
+	INSERT INTO [IzendaExportMarginDefaultValue]([Id],[Type],[TopValue],[BottomValue],[LeftValue],[RightValue],[HeaderValue],[FooterValue],[Version],[Deleted]) 
+	VALUES('DF2D2380-48C9-4249-AACB-8FD3A3465607', '6', '8.26', '8.26', '11.19', '11.19', '8.26', '8.26', '1', '0');
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_NAME='IzendaQuerySourceField' AND COLUMN_NAME='SupportDefaultTotal')
+BEGIN
+	ALTER TABLE IzendaQuerySourceField ADD SupportDefaultTotal bit NULL
+END
+
+UPDATE IzendaDBVersion SET Version= '2.6.0';
+
+
+-- ========================================================
+-- v2.6.1
+-- ========================================================
+
+UPDATE IzendaDBVersion SET Version= '2.6.1';
+
+
+-- ========================================================
+-- v2.6.2
+-- ========================================================
+
+UPDATE IzendaDBVersion SET Version= '2.6.2';
+
+
+-- ========================================================
+-- v2.6.3
+-- ========================================================
+
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+UPDATE IzendaDBVersion SET Version= '2.6.3';
+
+
+-- ========================================================
+-- v2.6.4
+-- ========================================================
+
+DECLARE @newId2 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items2 int = 0;
+  SELECT @items2 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items2 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId2 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items2 = 2)
+  BEGIN
+	DECLARE @defaultItem2 datetime = NULL;
+	DECLARE @customItem2 datetime = NULL;
+
+	SELECT @defaultItem2 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem2 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem2 > @customItem2)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght2 int
+				  ,@MaxNumberOfPasswordLenght2 int
+				  ,@MinNumberOfSpecialCharacter2 int
+				  ,@MaxNumberOfSpecialCharacter2 int
+				  ,@MinNumberOfUppercaseCharacter2 int
+				  ,@MaxNumberOfUppercaseCharacter2 int
+				  ,@MinNumberOfLowercaseCharacter2 int
+				  ,@MaxNumberOfLowercaseCharacter2 int
+				  ,@MinNumberOfNumericCharacter2 int
+				  ,@MaxNumberOfNumericCharacter2 int
+				  ,@MaxNumberOfRepeatSequential2 int
+				  ,@MinNumberOfPasswordAge2 int
+				  ,@MaxNumberOfPasswordAge2 int
+				  ,@NotifyUseDuring2 int
+				  ,@NumberOfPasswordToKeep2 int
+				  ,@PasswordLinkValidity2 int
+				  ,@NumberOfQuestionProfile2 int
+				  ,@NumberOfQuestionResetPassword2 int
+				  ,@NumberOfFailedLogonAllowed2 int
+				  ,@NumberOfFailedAnswerAllowed2 int
+				  ,@LockoutPeriod2 int;
+
+	    SELECT @MinNumberOfPasswordLenght2 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght2 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter2 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter2 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter2 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter2 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter2 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter2 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter2 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter2 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential2 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge2 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge2 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring2 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep2 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity2 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile2 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword2 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed2 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed2 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod2 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght2,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght2,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter2,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter2,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter2,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter2,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter2,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter2,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter2,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter2,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential2,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge2,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge2,
+		NotifyUseDuring = @NotifyUseDuring2,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep2,
+		PasswordLinkValidity = @PasswordLinkValidity2,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile2,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword2,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed2,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed2,
+		LockoutPeriod = @LockoutPeriod2
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId2 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+UPDATE IzendaDBVersion SET Version= '2.6.4';
+
+
+-- ========================================================
+-- v2.6.5
+-- ========================================================
+
+DECLARE @newId3 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items3 int = 0;
+  SELECT @items3 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items3 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId3 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items3 = 2)
+  BEGIN
+	DECLARE @defaultItem3 datetime = NULL;
+	DECLARE @customItem3 datetime = NULL;
+
+	SELECT @defaultItem3 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem3 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem3 > @customItem3)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght3 int
+				  ,@MaxNumberOfPasswordLenght3 int
+				  ,@MinNumberOfSpecialCharacter3 int
+				  ,@MaxNumberOfSpecialCharacter3 int
+				  ,@MinNumberOfUppercaseCharacter3 int
+				  ,@MaxNumberOfUppercaseCharacter3 int
+				  ,@MinNumberOfLowercaseCharacter3 int
+				  ,@MaxNumberOfLowercaseCharacter3 int
+				  ,@MinNumberOfNumericCharacter3 int
+				  ,@MaxNumberOfNumericCharacter3 int
+				  ,@MaxNumberOfRepeatSequential3 int
+				  ,@MinNumberOfPasswordAge3 int
+				  ,@MaxNumberOfPasswordAge3 int
+				  ,@NotifyUseDuring3 int
+				  ,@NumberOfPasswordToKeep3 int
+				  ,@PasswordLinkValidity3 int
+				  ,@NumberOfQuestionProfile3 int
+				  ,@NumberOfQuestionResetPassword3 int
+				  ,@NumberOfFailedLogonAllowed3 int
+				  ,@NumberOfFailedAnswerAllowed3 int
+				  ,@LockoutPeriod3 int;
+
+	    SELECT @MinNumberOfPasswordLenght3 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght3 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter3 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter3 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter3 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter3 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter3 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter3 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter3 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter3 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential3 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge3 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge3 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring3 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep3 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity3 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile3 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword3 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed3 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed3 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod3 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght3,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght3,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter3,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter3,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter3,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter3,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter3,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter3,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter3,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter3,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential3,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge3,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge3,
+		NotifyUseDuring = @NotifyUseDuring3,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep3,
+		PasswordLinkValidity = @PasswordLinkValidity3,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile3,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword3,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed3,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed3,
+		LockoutPeriod = @LockoutPeriod3
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId3 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.5';
+
+
+-- ========================================================
+-- v2.6.6
+-- ========================================================
+
+DECLARE @newId4 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items4 int = 0;
+  SELECT @items4 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items4 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId4 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items4 = 2)
+  BEGIN
+	DECLARE @defaultItem4 datetime = NULL;
+	DECLARE @customItem4 datetime = NULL;
+
+	SELECT @defaultItem4 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem4 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem4 > @customItem4)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght4 int
+				  ,@MaxNumberOfPasswordLenght4 int
+				  ,@MinNumberOfSpecialCharacter4 int
+				  ,@MaxNumberOfSpecialCharacter4 int
+				  ,@MinNumberOfUppercaseCharacter4 int
+				  ,@MaxNumberOfUppercaseCharacter4 int
+				  ,@MinNumberOfLowercaseCharacter4 int
+				  ,@MaxNumberOfLowercaseCharacter4 int
+				  ,@MinNumberOfNumericCharacter4 int
+				  ,@MaxNumberOfNumericCharacter4 int
+				  ,@MaxNumberOfRepeatSequential4 int
+				  ,@MinNumberOfPasswordAge4 int
+				  ,@MaxNumberOfPasswordAge4 int
+				  ,@NotifyUseDuring4 int
+				  ,@NumberOfPasswordToKeep4 int
+				  ,@PasswordLinkValidity4 int
+				  ,@NumberOfQuestionProfile4 int
+				  ,@NumberOfQuestionResetPassword4 int
+				  ,@NumberOfFailedLogonAllowed4 int
+				  ,@NumberOfFailedAnswerAllowed4 int
+				  ,@LockoutPeriod4 int;
+
+	    SELECT @MinNumberOfPasswordLenght4 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght4 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter4 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter4 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter4 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter4 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter4 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter4 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter4 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter4 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential4 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge4 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge4 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring4 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep4 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity4 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile4 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword4 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed4 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed4 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod4 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght4,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght4,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter4,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter4,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter4,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter4,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter4,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter4,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter4,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter4,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential4,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge4,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge4,
+		NotifyUseDuring = @NotifyUseDuring4,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep4,
+		PasswordLinkValidity = @PasswordLinkValidity4,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile4,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword4,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed4,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed4,
+		LockoutPeriod = @LockoutPeriod4
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId4 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.6';
+
+
+-- ========================================================
+-- v2.6.7
+-- ========================================================
+
+DECLARE @newId5 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items5 int = 0;
+  SELECT @items5 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items5 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId5 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items5 = 2)
+  BEGIN
+	DECLARE @defaultItem5 datetime = NULL;
+	DECLARE @customItem5 datetime = NULL;
+
+	SELECT @defaultItem5 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem5 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem5 > @customItem5)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght5 int
+				  ,@MaxNumberOfPasswordLenght5 int
+				  ,@MinNumberOfSpecialCharacter5 int
+				  ,@MaxNumberOfSpecialCharacter5 int
+				  ,@MinNumberOfUppercaseCharacter5 int
+				  ,@MaxNumberOfUppercaseCharacter5 int
+				  ,@MinNumberOfLowercaseCharacter5 int
+				  ,@MaxNumberOfLowercaseCharacter5 int
+				  ,@MinNumberOfNumericCharacter5 int
+				  ,@MaxNumberOfNumericCharacter5 int
+				  ,@MaxNumberOfRepeatSequential5 int
+				  ,@MinNumberOfPasswordAge5 int
+				  ,@MaxNumberOfPasswordAge5 int
+				  ,@NotifyUseDuring5 int
+				  ,@NumberOfPasswordToKeep5 int
+				  ,@PasswordLinkValidity5 int
+				  ,@NumberOfQuestionProfile5 int
+				  ,@NumberOfQuestionResetPassword5 int
+				  ,@NumberOfFailedLogonAllowed5 int
+				  ,@NumberOfFailedAnswerAllowed5 int
+				  ,@LockoutPeriod5 int;
+
+	    SELECT @MinNumberOfPasswordLenght5 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght5 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter5 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter5 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter5 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter5 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter5 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter5 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter5 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter5 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential5 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge5 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge5 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring5 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep5 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity5 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile5 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword5 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed5 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed5 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod5 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght5,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght5,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter5,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter5,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter5,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter5,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter5,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter5,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter5,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter5,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential5,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge5,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge5,
+		NotifyUseDuring = @NotifyUseDuring5,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep5,
+		PasswordLinkValidity = @PasswordLinkValidity5,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile5,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword5,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed5,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed5,
+		LockoutPeriod = @LockoutPeriod5
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId5 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.7';
+
+
+-- ========================================================
+-- v2.6.8
+-- ========================================================
+
+DECLARE @newId6 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items6 int = 0;
+  SELECT @items6 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items6 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId6 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items6 = 2)
+  BEGIN
+	DECLARE @defaultItem6 datetime = NULL;
+	DECLARE @customItem6 datetime = NULL;
+
+	SELECT @defaultItem6 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem6 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem6 > @customItem6)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght6 int
+				  ,@MaxNumberOfPasswordLenght6 int
+				  ,@MinNumberOfSpecialCharacter6 int
+				  ,@MaxNumberOfSpecialCharacter6 int
+				  ,@MinNumberOfUppercaseCharacter6 int
+				  ,@MaxNumberOfUppercaseCharacter6 int
+				  ,@MinNumberOfLowercaseCharacter6 int
+				  ,@MaxNumberOfLowercaseCharacter6 int
+				  ,@MinNumberOfNumericCharacter6 int
+				  ,@MaxNumberOfNumericCharacter6 int
+				  ,@MaxNumberOfRepeatSequential6 int
+				  ,@MinNumberOfPasswordAge6 int
+				  ,@MaxNumberOfPasswordAge6 int
+				  ,@NotifyUseDuring6 int
+				  ,@NumberOfPasswordToKeep6 int
+				  ,@PasswordLinkValidity6 int
+				  ,@NumberOfQuestionProfile6 int
+				  ,@NumberOfQuestionResetPassword6 int
+				  ,@NumberOfFailedLogonAllowed6 int
+				  ,@NumberOfFailedAnswerAllowed6 int
+				  ,@LockoutPeriod6 int;
+
+	    SELECT @MinNumberOfPasswordLenght6 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght6 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter6 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter6 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter6 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter6 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter6 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter6 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter6 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter6 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential6 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge6 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge6 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring6 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep6 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity6 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile6 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword6 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed6 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed6 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod6 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght6,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght6,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter6,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter6,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter6,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter6,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter6,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter6,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter6,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter6,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential6,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge6,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge6,
+		NotifyUseDuring = @NotifyUseDuring6,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep6,
+		PasswordLinkValidity = @PasswordLinkValidity6,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile6,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword6,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed6,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed6,
+		LockoutPeriod = @LockoutPeriod6
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId6 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.8';
+
+
+-- ========================================================
+-- v2.6.9
+-- ========================================================
+
+DECLARE @newId7 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items7 int = 0;
+  SELECT @items7 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items7 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId7 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items7 = 2)
+  BEGIN
+	DECLARE @defaultItem7 datetime = NULL;
+	DECLARE @customItem7 datetime = NULL;
+
+	SELECT @defaultItem7 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem7 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem7 > @customItem7)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght7 int
+				  ,@MaxNumberOfPasswordLenght7 int
+				  ,@MinNumberOfSpecialCharacter7 int
+				  ,@MaxNumberOfSpecialCharacter7 int
+				  ,@MinNumberOfUppercaseCharacter7 int
+				  ,@MaxNumberOfUppercaseCharacter7 int
+				  ,@MinNumberOfLowercaseCharacter7 int
+				  ,@MaxNumberOfLowercaseCharacter7 int
+				  ,@MinNumberOfNumericCharacter7 int
+				  ,@MaxNumberOfNumericCharacter7 int
+				  ,@MaxNumberOfRepeatSequential7 int
+				  ,@MinNumberOfPasswordAge7 int
+				  ,@MaxNumberOfPasswordAge7 int
+				  ,@NotifyUseDuring7 int
+				  ,@NumberOfPasswordToKeep7 int
+				  ,@PasswordLinkValidity7 int
+				  ,@NumberOfQuestionProfile7 int
+				  ,@NumberOfQuestionResetPassword7 int
+				  ,@NumberOfFailedLogonAllowed7 int
+				  ,@NumberOfFailedAnswerAllowed7 int
+				  ,@LockoutPeriod7 int;
+
+	    SELECT @MinNumberOfPasswordLenght7 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght7 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter7 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter7 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter7 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter7 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter7 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter7 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter7 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter7 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential7 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge7 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge7 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring7 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep7 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity7 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile7 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword7 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed7 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed7 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod7 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght7,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght7,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter7,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter7,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter7,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter7,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter7,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter7,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter7,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter7,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential7,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge7,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge7,
+		NotifyUseDuring = @NotifyUseDuring7,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep7,
+		PasswordLinkValidity = @PasswordLinkValidity7,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile7,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword7,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed7,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed7,
+		LockoutPeriod = @LockoutPeriod7
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId7 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.9';
+
+
+-- ========================================================
+-- v2.6.10
+-- ========================================================
+
+DECLARE @newId8 uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items8 int = 0;
+  SELECT @items8 = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items8 = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId8 WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items8 = 2)
+  BEGIN
+	DECLARE @defaultItem8 datetime = NULL;
+	DECLARE @customItem8 datetime = NULL;
+
+	SELECT @defaultItem8 = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem8 = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem8 > @customItem8)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght8 int
+				  ,@MaxNumberOfPasswordLenght8 int
+				  ,@MinNumberOfSpecialCharacter8 int
+				  ,@MaxNumberOfSpecialCharacter8 int
+				  ,@MinNumberOfUppercaseCharacter8 int
+				  ,@MaxNumberOfUppercaseCharacter8 int
+				  ,@MinNumberOfLowercaseCharacter8 int
+				  ,@MaxNumberOfLowercaseCharacter8 int
+				  ,@MinNumberOfNumericCharacter8 int
+				  ,@MaxNumberOfNumericCharacter8 int
+				  ,@MaxNumberOfRepeatSequential8 int
+				  ,@MinNumberOfPasswordAge8 int
+				  ,@MaxNumberOfPasswordAge8 int
+				  ,@NotifyUseDuring8 int
+				  ,@NumberOfPasswordToKeep8 int
+				  ,@PasswordLinkValidity8 int
+				  ,@NumberOfQuestionProfile8 int
+				  ,@NumberOfQuestionResetPassword8 int
+				  ,@NumberOfFailedLogonAllowed8 int
+				  ,@NumberOfFailedAnswerAllowed8 int
+				  ,@LockoutPeriod8 int;
+
+	    SELECT @MinNumberOfPasswordLenght8 = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght8 = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter8 = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter8 = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter8 = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter8 = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter8 = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter8 = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter8 = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter8 = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential8 = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge8 = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge8 = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring8 = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep8 = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity8 = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile8 = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword8 = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed8 = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed8 = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod8 = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght8,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght8,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter8,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter8,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter8,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter8,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter8,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter8,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter8,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter8,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential8,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge8,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge8,
+		NotifyUseDuring = @NotifyUseDuring8,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep8,
+		PasswordLinkValidity = @PasswordLinkValidity8,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile8,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword8,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed8,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed8,
+		LockoutPeriod = @LockoutPeriod8
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId8 WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.10';
+
+
+-- ========================================================
+-- v2.6.11
+-- ========================================================
+
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.11';
+
+
+-- ========================================================
+-- v2.6.12
+-- ========================================================
+
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.12';
+
+
+-- ========================================================
+-- v2.6.13
+-- ========================================================
+
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.13';
+
+
+-- ========================================================
+-- v2.6.14
+-- ========================================================
+
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.14';
+
+
+-- ========================================================
+-- v2.6.15
+-- ========================================================
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.15';
+
+
+
+-- ========================================================
+-- v2.6.16
+-- ========================================================
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.16';
+
+
+
+-- ========================================================
+-- v2.6.17
+-- ========================================================
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.17';
+
+
+
+-- ========================================================
+-- v2.6.18
+-- ========================================================
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.18';
+
+
+
+-- ========================================================
+-- v2.6.19
+-- ========================================================
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.19';
+
+
+
+-- ========================================================
+-- v2.6.20
+-- ========================================================
+DECLARE @newId uniqueidentifier = '9b85320e-00a5-44a3-8c5f-685b8e6e6e59';
+  DECLARE @items int = 0;
+  SELECT @items = count(*) FROM IzendaSecurityPolicy;  
+  IF(@items = 1)
+  BEGIN 
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D' AND Modified IS NULL;
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+  END
+  ELSE IF(@items = 2)
+  BEGIN
+	DECLARE @defaultItem datetime = NULL;
+	DECLARE @customItem datetime = NULL;
+
+	SELECT @defaultItem = Modified FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	SELECT @customItem = Modified FROM IzendaSecurityPolicy WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	IF(@defaultItem > @customItem)
+	BEGIN 	
+		DECLARE @MinNumberOfPasswordLenght int
+				  ,@MaxNumberOfPasswordLenght int
+				  ,@MinNumberOfSpecialCharacter int
+				  ,@MaxNumberOfSpecialCharacter int
+				  ,@MinNumberOfUppercaseCharacter int
+				  ,@MaxNumberOfUppercaseCharacter int
+				  ,@MinNumberOfLowercaseCharacter int
+				  ,@MaxNumberOfLowercaseCharacter int
+				  ,@MinNumberOfNumericCharacter int
+				  ,@MaxNumberOfNumericCharacter int
+				  ,@MaxNumberOfRepeatSequential int
+				  ,@MinNumberOfPasswordAge int
+				  ,@MaxNumberOfPasswordAge int
+				  ,@NotifyUseDuring int
+				  ,@NumberOfPasswordToKeep int
+				  ,@PasswordLinkValidity int
+				  ,@NumberOfQuestionProfile int
+				  ,@NumberOfQuestionResetPassword int
+				  ,@NumberOfFailedLogonAllowed int
+				  ,@NumberOfFailedAnswerAllowed int
+				  ,@LockoutPeriod int;
+
+	    SELECT @MinNumberOfPasswordLenght = MinNumberOfPasswordLenght
+			  ,@MaxNumberOfPasswordLenght = MaxNumberOfPasswordLenght
+			  ,@MinNumberOfSpecialCharacter = MinNumberOfSpecialCharacter
+			  ,@MaxNumberOfSpecialCharacter = MaxNumberOfSpecialCharacter
+			  ,@MinNumberOfUppercaseCharacter = MinNumberOfUppercaseCharacter
+			  ,@MaxNumberOfUppercaseCharacter = MaxNumberOfUppercaseCharacter
+			  ,@MinNumberOfLowercaseCharacter = MinNumberOfLowercaseCharacter
+			  ,@MaxNumberOfLowercaseCharacter = MaxNumberOfLowercaseCharacter
+			  ,@MinNumberOfNumericCharacter = MinNumberOfNumericCharacter
+			  ,@MaxNumberOfNumericCharacter = MaxNumberOfNumericCharacter
+			  ,@MaxNumberOfRepeatSequential = MaxNumberOfRepeatSequential
+			  ,@MinNumberOfPasswordAge = MinNumberOfPasswordAge
+			  ,@MaxNumberOfPasswordAge = MaxNumberOfPasswordAge
+			  ,@NotifyUseDuring = NotifyUseDuring
+			  ,@NumberOfPasswordToKeep = NumberOfPasswordToKeep
+			  ,@PasswordLinkValidity = PasswordLinkValidity
+			  ,@NumberOfQuestionProfile = NumberOfQuestionProfile
+			  ,@NumberOfQuestionResetPassword = NumberOfQuestionResetPassword
+			  ,@NumberOfFailedLogonAllowed = NumberOfFailedLogonAllowed
+			  ,@NumberOfFailedAnswerAllowed = NumberOfFailedAnswerAllowed
+			  ,@LockoutPeriod = LockoutPeriod
+	    FROM IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	
+		UPDATE IzendaSecurityPolicy SET
+		MinNumberOfPasswordLenght = @MinNumberOfPasswordLenght,
+		MaxNumberOfPasswordLenght = @MaxNumberOfPasswordLenght,
+		MinNumberOfSpecialCharacter = @MinNumberOfSpecialCharacter,
+		MaxNumberOfSpecialCharacter = @MaxNumberOfSpecialCharacter,
+		MinNumberOfUppercaseCharacter = @MinNumberOfUppercaseCharacter,
+		MaxNumberOfUppercaseCharacter = @MaxNumberOfUppercaseCharacter,
+		MinNumberOfLowercaseCharacter = @MinNumberOfLowercaseCharacter,
+		MaxNumberOfLowercaseCharacter = @MaxNumberOfLowercaseCharacter,
+		MinNumberOfNumericCharacter = @MinNumberOfNumericCharacter,
+		MaxNumberOfNumericCharacter = @MaxNumberOfNumericCharacter,
+		MaxNumberOfRepeatSequential = @MaxNumberOfRepeatSequential,
+		MinNumberOfPasswordAge = @MinNumberOfPasswordAge,
+		MaxNumberOfPasswordAge = @MaxNumberOfPasswordAge,
+		NotifyUseDuring = @NotifyUseDuring,
+		NumberOfPasswordToKeep = @NumberOfPasswordToKeep,
+		PasswordLinkValidity = @PasswordLinkValidity,
+		NumberOfQuestionProfile = @NumberOfQuestionProfile,
+		NumberOfQuestionResetPassword = @NumberOfQuestionResetPassword,
+		NumberOfFailedLogonAllowed = @NumberOfFailedLogonAllowed,
+		NumberOfFailedAnswerAllowed = @NumberOfFailedAnswerAllowed,
+		LockoutPeriod = @LockoutPeriod
+		WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+
+	END
+
+	DELETE IzendaSecurityPolicy WHERE Id = 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+	UPDATE IzendaSecurityPolicy SET Id = @newId WHERE Id != 'FA528971-A8AF-45AB-A0B3-D539104E1B0D';
+ END
+
+GO
+ 
+UPDATE IzendaTemporaryData SET TenantId = '00000000-0000-0000-0000-000000000000' 
+WHERE TenantId IS NULL;
+GO
+
+ALTER TABLE IzendaTemporaryData
+ALTER COLUMN TenantId uniqueidentifier NOT NULL;
+
+GO
+
+IF NOT EXISTS ( SELECT * FROM sys.key_constraints
+    WHERE Type = 'PK' AND Name = 'PK_IzendaTemporaryData')
+BEGIN
+	ALTER TABLE IzendaTemporaryData ADD CONSTRAINT PK_IzendaTemporaryData 
+		PRIMARY KEY (Id, TenantId);
+END
+
+GO 
+ 
+-- fix 18584 - begin
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='WoeName')
+BEGIN
+	ALTER TABLE IzendaCity ADD WoeName nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaCity' AND COLUMN_NAME='HcA2')
+BEGIN
+	ALTER TABLE IzendaCity ADD HcA2 nvarchar(10) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryCode')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryCode nvarchar(255) NULL
+END
+
+IF NOT EXISTS ( SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='IzendaPostalCode' AND COLUMN_NAME='CountryName')
+BEGIN
+	ALTER TABLE IzendaPostalCode ADD CountryName nvarchar(255) NULL
+END
+-- fix 18584 - end
+
+
+CREATE TABLE #UserPermTemp (Id uniqueidentifier, AssignedTo nvarchar(4000), AssignedToNames nvarchar(4000));
+
+GO
+
+WITH UserPerm AS
+(
+	SELECT Id, AssignedTo, AssignedToNames FROM IzendaUserPermission WHERE AssignedToNames IS NULL AND AssignedType = 2
+)
+INSERT INTO #UserPermTemp
+SELECT t1.Id, t1.AssignedTo , '[' + LEFT(IdTable.Names, LEN(IdTable.Names)-1) + ']' AS AssignedToNames
+FROM UserPerm t1
+INNER JOIN
+(
+	SELECT up.Id, A.Names
+	FROM (
+	SELECT Id, CAST(('<i>' + REPLACE(REPLACE(REPLACE(REPLACE(AssignedTo, '[',''),']',''),'"',''), ',', '</i><i>') + '</i>') AS XML) IdXml
+	FROM UserPerm
+	) up
+	CROSS APPLY (
+		SELECT '"' + r.Name + '",' AS 'data()'
+		FROM (
+			SELECT SUBSTRING(Value, 1, LEN(Value)) as IDValues
+			FROM (
+				SELECT t.i.value('.', 'VARCHAR(MAX)') AS Value
+				FROM up.IdXml.nodes('i') AS t(i)
+				WHERE t.i.value('.', 'VARCHAR(MAX)') <> ''
+			) l
+			WHERE LEN(l.Value) > 0
+		) o JOIN IzendaRole r ON CAST(o.IDValues AS uniqueidentifier) = r.Id
+		FOR XML PATH('')
+	) AS A(Names)
+) AS IdTable ON t1.Id = IdTable.Id;
+
+GO
+
+UPDATE up
+SET AssignedToNames = t.AssignedToNames
+FROM IzendaUserPermission up INNER JOIN #UserPermTemp t ON up.Id = t.Id
+WHERE up.AssignedToNames IS NULL;
+
+UPDATE IzendaUserPermission SET AssignedToNames = '[]' WHERE AssignedToNames IS NULL AND AssignedType = 2;
+
+GO
+
+DROP TABLE #UserPermTemp;
+
+GO
+
+IF NOT EXISTS (SELECT * FROM IzendaSystemSetting WHERE Id = '9EEEECCD-140A-4694-BA7A-CA845F87ED7B')
+BEGIN
+    INSERT INTO [IzendaSystemSetting]([Id],[Name],[Value],[Deleted]) VALUES ('9EEEECCD-140A-4694-BA7A-CA845F87ED7B','UseADOJobStore','0','0')
+END
+
+
+-- fix 16885 - begin
+ALTER TABLE IzendaQuerySource ALTER COLUMN ExtendedProperties NVARCHAR(MAX);
+-- fix 16885 - end
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes AS si
+    JOIN sys.objects AS so on si.object_id=so.object_id
+    JOIN sys.schemas AS sc on so.schema_id=sc.schema_id
+    WHERE 
+        so.name ='IzendaReportDataSource' /* Table */
+        AND si.name='IX_IzendaReportDataSource_ID_Version' /* Index */
+	)
+	PRINT 'IX_IzendaReportDataSource_ID_Version exists!'
+ELSE
+	CREATE NONCLUSTERED INDEX [IX_IzendaReportDataSource_ID_Version] ON [dbo].[IzendaReportDataSource]
+	(
+		Id ASC,
+		[Version] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING= OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+ 
+UPDATE IzendaDBVersion SET Version= '2.6.20';
