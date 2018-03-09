@@ -10,7 +10,7 @@ This Starterkit showcases how to embed the front-end of Izenda into a MVC5 appli
 
  :warning: The MVC Kit is designed for demonstration purposes and should not be used as an “as-is” fully-integrated solution. You can use the kit for reference or a baseline but ensure that security and customization meet the standards of your company.
  
- :warning: This deployment is currently using version 2.4.4. If you wish to update to a later version, ensure that you run the appropriate schema migration scripts.
+ :warning: This deployment is currently using version 2.6.20. If you wish to update to a later version, ensure that you run the appropriate schema migration scripts.
 
 ### Deploying the standalone API and Izenda Configuration Database
 
