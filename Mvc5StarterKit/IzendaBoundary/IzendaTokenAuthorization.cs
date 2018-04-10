@@ -10,11 +10,11 @@ namespace Mvc5StarterKit.IzendaBoundary
         const string KEY = "THISISKEY1234567"; //must be at least 16 characters long (128 bits)
 
         /// <summary>
-        /// Generate token from UserInfo. Userinfo will be encrypted before sending to Izenda.
+        /// Generate token from AccessTokenInfo. Userinfo will be encrypted before sending to Izenda.
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static string GetToken(UserInfo user)
+        public static string GetToken(AccessTokenInfo user)
         {
             // remove tenant property when sending token to Izenda, if Tenant is System.
             if (user.TenantUniqueName == "System")
@@ -34,7 +34,7 @@ namespace Mvc5StarterKit.IzendaBoundary
         {
             var userName = ConfigurationManager.AppSettings["IzendaAdminUser"];
 
-            var user = new UserInfo { UserName = userName };
+            var user = new AccessTokenInfo { UserName = userName };
             return GetToken(user);
         }
 
@@ -44,15 +44,15 @@ namespace Mvc5StarterKit.IzendaBoundary
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static UserInfo GetUserInfo(string token)
+        public static AccessTokenInfo GetUserInfo(string token)
         {
             var serializedObject = StringCipher.Decrypt(token, KEY);
-            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserInfo>(serializedObject);
+            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<AccessTokenInfo>(serializedObject);
             return user;
         }
 
 
-        public static UserInfo DecryptIzendaAuthenticationMessage(string encryptedMessage)
+        public static AccessTokenInfo DecryptIzendaAuthenticationMessage(string encryptedMessage)
         {
             var rsaPrivateKey = ConfigurationManager.AppSettings["RSAPrivateKey"];
             var cipher = new System.Security.Cryptography.RSACryptoServiceProvider();
@@ -71,7 +71,7 @@ namespace Mvc5StarterKit.IzendaBoundary
             var decryptedBytes = cipher.Decrypt(resultBytes, false);
             var decryptedData = System.Text.Encoding.UTF8.GetString(decryptedBytes);
 
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<UserInfo>(decryptedData);
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<AccessTokenInfo>(decryptedData);
 
             return result;
         }
