@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Izenda Integrated Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
@@ -32,10 +32,10 @@
                     @if (Context.User.Identity.IsAuthenticated)
                     {
                         //Izenda Page
-                        <li>@Html.ActionLink("Izenda", "Izenda", "Home")</li>
+                        <li>@Html.ActionLink("Izenda", "Index", "Izenda")</li>
 
                         @* Settings *@
-                        <li>@Html.ActionLink("Settings", "Settings", "Home")</li>
+                        <li>@Html.ActionLink("Settings", "Settings", "Izenda")</li>
 
                         @* Reports *@
                         <li class="dropdown">
@@ -44,9 +44,9 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li>@Html.ActionLink("New Report", "ReportDesigner", "Home")</li>
-                                <li>@Html.ActionLink("Report List", "Reports", "Home")</li>
-                                <li>@Html.ActionLink("Report1 Viewer", "ReportViewer", "Report", new { id = "[your report id]" }, null)</li>
+                                <li>@Html.ActionLink("New Report", "ReportDesigner", "Report")</li>
+                                <li>@Html.ActionLink("Report List", "Index", "Report")</li>
+                                <li>@Html.ActionLink("Report1 Viewer", "ReportViewer", "Report", new { id = "[your_report_id]" }, null)</li>
                                 <li>@Html.ActionLink("Customized Report1 Filters Viewer", "ReportCustomFilterViewer", "Report")</li>
                                 <li>@Html.ActionLink("Report Parts", "ReportParts", "Report")</li>
                                 <li>@Html.ActionLink("Advanced Report Parts", "AdvancedReportParts", "Report")</li>
@@ -60,9 +60,9 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li>@Html.ActionLink("New Dashboard", "DashboardDesigner", "Home")</li>
-                                <li>@Html.ActionLink("Dashboard List", "Dashboards", "Home")</li>
-                                <li>@Html.ActionLink("Dashboard Viewer", "DashboardViewer", "Dashboard", new { id = "[your dashboard id]" }, null)</li>
+                                <li>@Html.ActionLink("New Dashboard", "DashboardDesigner", "Dashboard")</li>
+                                <li>@Html.ActionLink("Dashboard List", "Index", "Dashboard")</li>
+                                <li>@Html.ActionLink("Dashboard Viewer", "DashboardViewer", "Dashboard", new { id = "[your_dashboard_id]" }, null)</li>
                             </ul>
                         </li>
                     }

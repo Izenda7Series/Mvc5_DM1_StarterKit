@@ -8,6 +8,7 @@ using Microsoft.Owin.Security.OAuth;
 using Owin;
 using Mvc5StarterKit.Models;
 using Mvc5StarterKit.Providers;
+using Microsoft.Owin.Cors;
 
 namespace Mvc5StarterKit
 {
@@ -18,6 +19,9 @@ namespace Mvc5StarterKit
         // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
         {
+            // Config is used in case that external application eanble CORS
+            app.UseCors(CorsOptions.AllowAll);
+
             // Configure the db context, user manager and signin manager to use a single instance per request
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
@@ -30,7 +34,7 @@ namespace Mvc5StarterKit
             {
                 TokenEndpointPath = new PathString("/Token"),
                 Provider = new ApplicationOAuthProvider(PublicClientId),
-                AuthorizeEndpointPath = new PathString("/api/Account/ExternalLogin"),
+                AuthorizeEndpointPath = new PathString("/api/ExternalLogin/ExternalLogin"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(14),
                 // In production mode set AllowInsecureHttp = false
                 AllowInsecureHttp = true

@@ -6,8 +6,19 @@ using System.Web.Mvc;
 
 namespace Mvc5StarterKit.Controllers
 {
+    [Authorize]
     public class ReportController : Controller
     {
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult ReportDesigner()
+        {
+            return View();
+        }
+
         // show report Viewer by id
         public ActionResult ReportViewer(string id)
         {
@@ -15,6 +26,13 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        public ActionResult ReportPart(Guid id, string token)
+        {
+            ViewBag.Id = id;
+            ViewBag.Token = token;
+            return View();
+        }
 
         public ActionResult ReportCustomFilterViewer()
         {

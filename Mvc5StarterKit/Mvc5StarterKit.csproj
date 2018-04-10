@@ -51,11 +51,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common">
-      <HintPath>IzendaReferences\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.0\lib\net451\Microsoft.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity">
-      <HintPath>IzendaReferences\Microsoft.Practices.Unity.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Cors, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Cors.4.0.0\lib\net451\Microsoft.Owin.Cors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -68,6 +68,9 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Cors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.0.0\lib\net45\System.Web.Cors.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -159,9 +162,6 @@
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin">
-      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
@@ -188,8 +188,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiControllers\AccountController.cs" />
-    <Compile Include="ApiControllers\UserController.cs" />
+    <Compile Include="ApiControllers\ExternalLoginController.cs" />
+    <Compile Include="ApiControllers\IzendaAccessTokenController.cs" />
+    <Compile Include="ApiControllers\ExternalIzendaTokenController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
@@ -198,10 +199,11 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\IzendaController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\IzendaTokenController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -216,27 +218,10 @@
     <Compile Include="IzendaBoundary\WebApiService.cs" />
     <Compile Include="IzendaConfig.cs" />
     <Compile Include="Managers\TenantManager.cs" />
-    <Compile Include="Migrations\201611282113545_InitialCreate.cs" />
-    <Compile Include="Migrations\201611282113545_InitialCreate.Designer.cs">
-      <DependentUpon>201611282113545_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612050341494_AddTenant.cs" />
-    <Compile Include="Migrations\201612050341494_AddTenant.Designer.cs">
-      <DependentUpon>201612050341494_AddTenant.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612061005191_UpdateTenant.cs" />
-    <Compile Include="Migrations\201612061005191_UpdateTenant.Designer.cs">
-      <DependentUpon>201612061005191_UpdateTenant.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201701180802357_Update_User_Tenant.cs" />
-    <Compile Include="Migrations\201701180802357_Update_User_Tenant.Designer.cs">
-      <DependentUpon>201701180802357_Update_User_Tenant.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\AccessTokenInfo.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Startup.cs" />
@@ -302,51 +287,36 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Home\Settings.cshtml" />
-    <Content Include="Views\Home\Reports.cshtml" />
-    <Content Include="Views\Home\ReportDesigner.cshtml" />
-    <Content Include="Views\Home\Dashboards.cshtml" />
-    <Content Include="Views\Home\DashboardDesigner.cshtml" />
-    <Content Include="Views\Home\Izenda.cshtml" />
+    <Content Include="Views\Izenda\Settings.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
+    <Content Include="Views\Report\ReportDesigner.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Dashboard\DashboardDesigner.cshtml" />
+    <Content Include="Views\Izenda\Index.cshtml" />
     <Content Include="Views\Report\ReportCustomFilterViewer.cshtml" />
     <Content Include="Views\Report\ReportParts.cshtml" />
     <Content Include="Views\Report\ReportViewer.cshtml" />
     <Content Include="Views\Shared\Izenda_Layout.cshtml" />
-    <Content Include="Views\Home\ReportPart.cshtml" />
+    <Content Include="Views\Report\ReportPart.cshtml" />
     <None Include="Views\Dashboard\DashboardViewer.cshtml" />
     <Content Include="Views\Report\AdvancedReportParts.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="IzendaReferences\" />
-    <Folder Include="IzendaResources\" />
     <Folder Include="Scripts\izenda\" />
-    <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201611282113545_InitialCreate.resx">
-      <DependentUpon>201611282113545_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612050341494_AddTenant.resx">
-      <DependentUpon>201612050341494_AddTenant.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612061005191_UpdateTenant.resx">
-      <DependentUpon>201612061005191_UpdateTenant.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201701180802357_Update_User_Tenant.resx">
-      <DependentUpon>201701180802357_Update_User_Tenant.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

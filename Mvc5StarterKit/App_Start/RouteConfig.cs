@@ -19,7 +19,7 @@ namespace Mvc5StarterKit
             routes.MapRoute(
                 name: "ReportPart",
                 url: "viewer/reportpart/{id}",
-                defaults: new { controller = "Home", action = "ReportPart" }
+                defaults: new { controller = "Report", action = "ReportPart" }
             );
 
             routes.MapRoute(

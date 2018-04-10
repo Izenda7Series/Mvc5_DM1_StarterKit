@@ -34,7 +34,7 @@ function errorFunc() {
 var DoRender = function (successFunc) {
     $.ajax({
         type: "GET",
-        url: "/user/GenerateToken",
+        url: "/IzendaToken/GenerateToken",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: successFunc,

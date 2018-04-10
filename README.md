@@ -16,17 +16,17 @@ This Starterkit showcases how to embed the front-end of Izenda into a MVC5 appli
 
 - Download and deploy the <a href="https://downloads.izenda.com/v2.6.20/API.zip">Izenda API</a> to IIS.
 
-- Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/Mvc5StarterKit/DBScript/mvc5_izenda.sql">DBScripts/mvc5_izenda.sql</a> to create a database named 'MVC5_Izenda' (This is the database for the Izenda configuration. It contains report definitions, dashboards,etc.). You may use any name of your choosing, just be sure to modify the script to USE the new database name.
+- Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/DBScript/mvc5_izenda.sql">DBScripts/mvc5_izenda.sql</a> to create a database named 'MVC5_Izenda' (This is the database for the Izenda configuration. It contains report definitions, dashboards,etc.). You may use any name of your choosing, just be sure to modify the script to USE the new database name.
 
 - Download a copy of the <a href="https://github.com/Izenda7Series/Mvc5StarterKit/blob/master/Mvc5StarterKit/izendadb.config">izendadb.config</a> file, and copy it to the root of your API deployment. Then modify the file with a valid connection string to this new database. If the connection string contains a ‘/’, ensure that you escape it ‘//’
 
-- In the IzendaSystemSettings table, update AuthValidateAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/account/validateIzendaAuthToken --> http://localhost:14809/api/account/validateIzendaAuthToken
+- In the IzendaSystemSettings table, update AuthValidateAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/IzendaAccessToken/ValidateIzendaAuthToken --> http://localhost:14809/api/IzendaAccessToken/ValidateIzendaAuthToken
 
-- In the IzendaSystemSettings table, update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/getAccessToken --> http://localhost:14809/api/GetIzendaAccessToken
+- In the IzendaSystemSettings table, update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/IzendaAccessToken/GetIzendaAccessToken --> http://localhost:14809/api/IzendaAccessToken/GetIzendaAccessToken
 
 ### Deploying the MVC Starter Kit Database
 
-- Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/Mvc5StarterKit/DBScript/mvc5.sql">DBScripts/mvc5.sql</a> to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to USE the new database name.
+- Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/DBScript/mvc5.sql">DBScripts/mvc5.sql</a> to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to USE the new database name.
 
 ### Deploying the Retail Database (optional)
 
@@ -147,10 +147,10 @@ Ensure that the AuthValidateAccessTokenUrl and AuthGetAccessTokenUrl values in t
 
 Examples:
 
-| Name                       | Value                                                     | 
-| -------------------------- |:----------------------------------------------------------|
-| AuthValidateAccessTokenUrl |http://localhost:14809/api/account/validateIzendaAuthToken |
-| AuthGetAccessTokenUrl      |http://localhost:14809/api/GetIzendaAccessToken            |
+| Name                       | Value                                                               | 
+| -------------------------- |:--------------------------------------------------------------------|
+| AuthValidateAccessTokenUrl |http://localhost:14809/api/IzendaAccessToken/ValidateIzendaAuthToken |
+| AuthGetAccessTokenUrl      |http://localhost:14809/api/IzendaAccessToken/GetIzendaAccessToken    |
 
 </br>
 
