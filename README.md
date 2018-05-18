@@ -26,11 +26,11 @@ This Starterkit showcases how to embed the front-end of Izenda into a MVC5 appli
 
 ### Deploying the MVC Starter Kit Database
 
-- Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/Mvc5StarterKit/DBScript/mvc5.sql">DBScripts/mvc5.sql</a> to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to USE the new database name.
+- Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/Mvc5StarterKit/DBScript/mvc5.sql">DBScript/mvc5.sql</a> to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to USE the new database name.
 
 ### Deploying the Retail Database (optional)
 
-Create the Retail database with the <a  href="https://github.com/Izenda7Series/Angular2Starterkit/blob/master/DbScripts/RetailDbScript.sql">RetailDbScript.sql</a> file.
+Create the Retail database with the <a  href="https://github.com/Izenda7Series/Angular2Starterkit/blob/master/DbScript/RetailDbScript.sql">RetailDbScript.sql</a> file.
 
  
 
