@@ -1,14 +1,21 @@
 ﻿body {
     height:100vh;
-    padding-top: 50px !important;
     padding-bottom: 40px !important;
+}
+
+body > div:first-child {
+    position: fixed;
+}
+
+body > div:first-child + div {
+    padding-top: 50px !important;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 /* Set padding to keep content from hitting the edges */
 .body-content {
-    height: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
+    height: 100%;  
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
