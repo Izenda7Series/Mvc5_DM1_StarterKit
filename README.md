@@ -14,7 +14,7 @@ This Starterkit showcases how to embed the front-end of Izenda into a MVC5 appli
 
 ### Deploying the standalone API and Izenda Configuration Database
 
-- Download and deploy the <a href="https://downloads.izenda.com/v2.6.20/API.zip">Izenda API</a> to IIS.
+- Download and deploy the <a href="https://downloads.izenda.com/v2.6.0-v2.6.24/v2.6.20/API.zip">Izenda API</a> to IIS.
 
 - Run the <a href="https://github.com/Izenda7Series/Mvc5StarterKit_BE_Standalone/blob/master/Mvc5StarterKit/DBScript/mvc5_izenda.sql">DBScript/mvc5_izenda.sql</a> to create a database named 'MVC5_Izenda' (This is the database for the Izenda configuration. It contains report definitions, dashboards,etc.). You may use any name of your choosing, just be sure to modify the script to USE the new database name.
 
@@ -46,7 +46,7 @@ Web.Config
 
 - Update the IzendaApiUrl to point to the port of your Izenda API.
 
-Download the <a href="https://downloads.izenda.com/v2.6.20/EmbeddedUI.zip">Izenda Embedded UI</a>, and copy/store the files into the Scripts/izenda folder.
+Download the <a href="https://downloads.izenda.com/v2.6.0-v2.6.24/v2.6.20/EmbeddedUI.zip">Izenda Embedded UI</a>, and copy/store the files into the Scripts/izenda folder.
 
 ### Update RSA Keys
 
