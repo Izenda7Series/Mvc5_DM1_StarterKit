@@ -1,21 +1,14 @@
 ﻿body {
     height:100vh;
-    padding-bottom: 40px !important;
-}
-
-body > div:first-child {
-    position: fixed;
-}
-
-body > div:first-child + div {
     padding-top: 50px !important;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-bottom: 40px !important;
 }
 
 /* Set padding to keep content from hitting the edges */
 .body-content {
-    height: 100%;  
+    height: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
@@ -27,14 +20,22 @@ body > div:first-child + div {
 
 .izenda-container {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     min-height: 100%;
-    /*margin-top:50px;*/ /* This is a hack, need to fix*/
+    /*margin-top:50px;*/ 
+}
+.readme-container {
+    margin-top:50px; 
+    min-height: 100vh;
 }
 
 .izenda-report-part {
     width: 800px;
     height: 500px;
+}
+
+#izenda-root .izenda .collapsible-list-items.panel-group .panel {
+    border-radius: 0;
 }
 
 .loader {
@@ -87,50 +88,4 @@ body > div:first-child + div {
 
 .izenda-header h1,h2{
     color: #1c4e89;
-}
-
-@media print {
-    .loader { display: none !important; }
-    #loader { display: none !important; }
-}
-
-/*Input for account info in login, register page*/
-.account-info input {
-    max-width: 280px;
-}
-
-/*Report parts*/
-.report-part-haft-width {
-    float: left;
-    width: 40%;
-    height: 40%;
-    margin-left: 5%;
-    margin-top: 5%;
-}
-
-.report-part-fullwidth {
-    float: left;
-    width: 85%;
-    height: 40%;
-    margin-left: 5%;
-    margin-top: 5%;
-}
-
-.report-part-container {
-    height: 50vh;
-    margin-top: 10px;
-}
-
-
-.pvalue-control {
-    width: 300px;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.428571429;
-    color: #555555;
-    vertical-align: middle;
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
 }
