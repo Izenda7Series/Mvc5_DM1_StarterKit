@@ -55,6 +55,9 @@ Download the <a href="https://downloads.izenda.com/v2.6.0-v2.6.24/v2.6.20/Embedd
   1. AuthRSAPublicKey value in the IzendaSystemSettings table of the Izenda database (note: only use keysize < 1024 to generate because max-length for this field in database is 256) . This value is your public key and should be in XML format.
   2. And RSAPrivateKey value in Web.config file of the MVC Kit. This value is your private key and should be in PEM format.
 
+### Update DeploymentMode value in IzendaSystemSettings table.
+
+e.g. value= 1 (BE Standlaone and FE integrated)
  
 
 ### Initial Log in
@@ -155,6 +158,11 @@ Examples:
 </br>
 
 You can use the script below to accomplish this. As general best practice, we recommend backing up your database before making any manual updates.
+
+
+### Troubleshoot-
+For Error- "You don't have permission to perform this action" , 
+update "IzendaAdmin@system.com" value in UserName column of IzendaUser table.
 
 ```sql
 
