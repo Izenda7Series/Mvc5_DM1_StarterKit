@@ -6,7 +6,10 @@
 {
     <script type="text/javascript">
         $(document).ready(function () {
-            izendaInitReportViewer('@ViewBag.Id');
+            var overridingFilterQueries = JSON.parse('@Html.Raw(WebUtility.HtmlDecode(ViewBag.overridingFilterQueries))');
+            izendaInitReportViewer('@ViewBag.Id', {
+                overridingFilterValue: overridingFilterQueries
+            });
         });
     </script>
 }
