@@ -315,6 +315,7 @@
     <Content Include="Views\Home\ReportPart.cshtml" />
     <None Include="Views\Dashboard\DashboardViewer.cshtml" />
     <Content Include="Views\Report\AdvancedReportParts.cshtml" />
+    <Content Include="Views\Home\IframeViewer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IzendaReferences\" />
