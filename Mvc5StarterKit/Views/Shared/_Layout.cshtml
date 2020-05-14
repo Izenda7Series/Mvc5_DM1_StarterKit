@@ -46,9 +46,14 @@
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("New Report", "ReportDesigner", "Home")</li>
                                 <li>@Html.ActionLink("Report List", "Reports", "Home")</li>
+
+                                @*For demo, your report id from [IzendaReport] table can be pasted here*@
                                 <li>@Html.ActionLink("Report Viewer", "ReportViewer", "Report", new { id = "[your report id]" }, null)</li>
+
                                 @*<li>@Html.ActionLink("Customized Report1 Filters Viewer", "ReportCustomFilterViewer", "Report")</li>*@
+
                                 <li>@Html.ActionLink("Report Parts", "ReportParts", "Report")</li>
+
                                 @*<li>@Html.ActionLink("Advanced Report Parts", "AdvancedReportParts", "Report")</li>*@
                             </ul>
                         </li>
@@ -62,7 +67,9 @@
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("New Dashboard", "DashboardDesigner", "Home")</li>
                                 <li>@Html.ActionLink("Dashboard List", "Dashboards", "Home")</li>
-                                <li>@Html.ActionLink("Dashboard Viewer", "DashboardViewer", "Dashboard", new { id = "[your dashboard id]" }, null)</li>
+
+                                @*For demo, your report id from [IzendaDashboard] table can be pasted here*@
+                                <li>@Html.ActionLink("Dashboard Viewer", "DashboardViewer", "Dashboard", new { id = "[your dashbord id]" }, null)</li>
                             </ul>
                         </li>
                     }
@@ -103,6 +110,5 @@
             $('[data-toggle="dropdown"]').dropdown();
         });
     </script>
-
 </body>
 </html>

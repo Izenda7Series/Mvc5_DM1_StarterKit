@@ -8,26 +8,36 @@
 {
     <script type="text/javascript">
         $(document).ready(function () {
+            // This is for demonstration only. Please refer to your [IzendaReportPart] table to populate samples here.
             // hard code an array object of report parts.
             var reportParts = [
                 {
                     "selector": "izenda-report-part1",              // the element id which we want to render report part on.
-                    "id": "F43BE711-342B-4E74-80CD-EBB6308C8DD4",   // the id of report part
-                    "overridingFilterValue": {                      // filter object to pass to api
-                        p1value: 60,                                // override filter value at position 1 which is applying on current report part (Quantity greater than 40)
-                        p2value: '40;#50'                           // override filter value at position 2 which is applying on current report part (Unit Price between 40 and 50)
-                    }
+                    "id": "[your report part id]",   // the id of report part
+
+                    // this is a property value example you can pass to API
+                    //"overridingFilterValue": {                      // filter object to pass to api
+                    //    p1value: 60,                                // override filter value at position 1 which is applying on current report part (Quantity greater than 40)
+                    //    p2value: '40;#50'                           // override filter value at position 2 which is applying on current report part (Unit Price between 40 and 50)
+                    //}
                 },
                 {
                     "selector": "izenda-report-part2",
-                    "id": "B5A9C762-B32E-4CD0-9CAF-8C93AE580255",
-                    "overridingFilterValue": {
-                        p1value: 60                                 // Quantity greater than 60
-                    }
+                    "id": "[your report part id]",
+
+                    // this is a property value example you can pass to API
+                    //"overridingFilterValue": {
+                    //    p1value: 60                                 // Quantity greater than 60
+                    //}
                 },
                 {
                     "selector": "izenda-report-part3",
-                    "id": "F2111034-B19B-477E-A037-90E12D7CB1E0"
+                    "id": "[your report part id]",
+
+                    // this is a property value example you can pass to API
+                    //"overridingFilterValue": {
+                    //    p1value: 60                                 // Quantity greater than 60
+                    //}
                 }
             ]
 
@@ -64,4 +74,3 @@
     <div class="report-part-haft-width" id="izenda-report-part2"></div>
     <div class="report-part-fullwidth" id="izenda-report-part3"></div>
 </div>
-
