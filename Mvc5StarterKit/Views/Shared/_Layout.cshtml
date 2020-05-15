@@ -46,10 +46,15 @@
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("New Report", "ReportDesigner", "Home")</li>
                                 <li>@Html.ActionLink("Report List", "Reports", "Home")</li>
-                                <li>@Html.ActionLink("Report1 Viewer", "ReportViewer", "Report", new { id = "[your report id]" }, null)</li>
-                                <li>@Html.ActionLink("Customized Report1 Filters Viewer", "ReportCustomFilterViewer", "Report")</li>
+
+                                @*For demo, your report id from [IzendaReport] table can be pasted here*@
+                                <li>@Html.ActionLink("Report Viewer", "ReportViewer", "Report", new { id = "[your report id]" }, null)</li>
+
+                                @*<li>@Html.ActionLink("Customized Report1 Filters Viewer", "ReportCustomFilterViewer", "Report")</li>*@
+
                                 <li>@Html.ActionLink("Report Parts", "ReportParts", "Report")</li>
-                                <li>@Html.ActionLink("Advanced Report Parts", "AdvancedReportParts", "Report")</li>
+
+                                @*<li>@Html.ActionLink("Advanced Report Parts", "AdvancedReportParts", "Report")</li>*@
                             </ul>
                         </li>
 
@@ -62,6 +67,8 @@
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("New Dashboard", "DashboardDesigner", "Home")</li>
                                 <li>@Html.ActionLink("Dashboard List", "Dashboards", "Home")</li>
+
+                                @*For demo, your report id from [IzendaDashboard] table can be pasted here*@
                                 <li>@Html.ActionLink("Dashboard Viewer", "DashboardViewer", "Dashboard", new { id = "[your dashboard id]" }, null)</li>
                             </ul>
                         </li>
@@ -75,12 +82,12 @@
     </div>
     <div class="container-fluid body-content">
         @RenderBody()
-        <br/>
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Izenda Integrated BI Platform</p>
-        </footer>
     </div>
-    
+
+    <hr />
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Izenda Integrated BI Platform</p>
+    </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
@@ -103,6 +110,5 @@
             $('[data-toggle="dropdown"]').dropdown();
         });
     </script>
-
 </body>
 </html>
