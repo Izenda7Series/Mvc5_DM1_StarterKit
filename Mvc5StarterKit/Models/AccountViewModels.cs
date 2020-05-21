@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Mvc5StarterKit.Models
 {
+    #region ViewModels
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
@@ -48,7 +49,7 @@ namespace Mvc5StarterKit.Models
 
     public class LoginViewModel
     {
-        [Display(Name ="Tenant")]
+        [Display(Name = "Tenant")]
         public string Tenant { get; set; }
 
         [Required]
@@ -63,6 +64,17 @@ namespace Mvc5StarterKit.Models
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
+    }
+
+    public class CreateTenantViewModel
+    {
+        [Required]
+        [Display(Name = "Tenant ID")]
+        public string TenantID { get; set; }
+
+        [Required]
+        [Display(Name = "Tenant Name")]
+        public string TenantName { get; set; }
     }
 
     public class RegisterViewModel
@@ -115,4 +127,5 @@ namespace Mvc5StarterKit.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
+    #endregion
 }

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Mvc5StarterKit.Managers
 {
     public class TenantManager
     {
+        #region Methods
         public Models.Tenant GetTenantByName(string name)
         {
             using (var context = Models.ApplicationDbContext.Create())
@@ -18,7 +17,6 @@ namespace Mvc5StarterKit.Managers
             }
         }
 
-
         public async Task<Models.Tenant> SaveTenantAsync(Models.Tenant tenant)
         {
             using (var context = Models.ApplicationDbContext.Create())
@@ -28,6 +26,7 @@ namespace Mvc5StarterKit.Managers
 
                 return tenant;
             }
-        }
+        } 
+        #endregion
     }
 }

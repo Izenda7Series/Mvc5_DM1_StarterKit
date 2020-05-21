@@ -1,14 +1,11 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Mvc5StarterKit.Models;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
 
 namespace Mvc5StarterKit.Controllers
 {
@@ -66,7 +63,6 @@ namespace Mvc5StarterKit.Controllers
             }
         }
 
-        //
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
@@ -75,7 +71,6 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
@@ -99,7 +94,60 @@ namespace Mvc5StarterKit.Controllers
             }
         }
 
-        //
+        // GET: /Account/CreateUser
+        [AllowAnonymous]
+        public ActionResult CreateUser()
+        {
+            ViewBag.ReturnUrl = null;
+            return View();
+        }
+
+        // POST: /Account/CreateTenant
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateTenant(CreateTenantViewModel model, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
+                
+                // these two variables are [Required]
+                var tenantId = model.TenantID;
+                var tenantName = model.TenantName;
+
+                var newTenant = new Tenant() { Name = tenantName };
+                var tenantManager = new Managers.TenantManager();
+                var isTenantExist = tenantManager.GetTenantByName(model.TenantName);
+
+                if (isTenantExist == null)
+                {
+                    // save a new tenant at user DB
+                    await tenantManager.SaveTenantAsync(newTenant);
+
+                    // create a new tenant at izenda DB
+                    await IzendaBoundary.IzendaUtilities.CreateTenant(tenantName, tenantId, izendaAdminAuthToken);
+                    
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return Content("Can't create a new Tenant. The Tenant already exists");
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        // GET: /Account/CreateUser
+        [AllowAnonymous]
+        public ActionResult CreateTenant()
+        {
+            ViewBag.ReturnUrl = null;
+            return View();
+        }
+
         // GET: /Account/VerifyCode
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
@@ -112,7 +160,6 @@ namespace Mvc5StarterKit.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
         // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
@@ -192,7 +239,7 @@ namespace Mvc5StarterKit.Controllers
                     var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
 
                     if(tenant != null)
-                        await IzendaBoundary.IzendaUtilities.CreateTenant(tenant.Name, izendaAdminAuthToken);
+                        await IzendaBoundary.IzendaUtilities.CreateTenant(tenant.Name, tenant.Name, izendaAdminAuthToken);
 
                     //CreateUser is Deprecated in favor of CreateIzendaUser
                     //await IzendaBoundary.IzendaUtilities.CreateUser(user, assignedRole, izendaAdminAuthToken);
@@ -224,7 +271,6 @@ namespace Mvc5StarterKit.Controllers
             return email.Split(new char[] { '@' })[1];
         }
 
-        //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
@@ -237,7 +283,6 @@ namespace Mvc5StarterKit.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
         public ActionResult ForgotPassword()
@@ -245,7 +290,6 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //
         // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
@@ -273,7 +317,6 @@ namespace Mvc5StarterKit.Controllers
             return View(model);
         }
 
-        //
         // GET: /Account/ForgotPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
@@ -281,7 +324,6 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
@@ -289,7 +331,6 @@ namespace Mvc5StarterKit.Controllers
             return code == null ? View("Error") : View();
         }
 
-        //
         // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
@@ -315,7 +356,6 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //
         // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
@@ -323,7 +363,6 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //
         // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
@@ -334,7 +373,6 @@ namespace Mvc5StarterKit.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
-        //
         // GET: /Account/SendCode
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
@@ -349,7 +387,6 @@ namespace Mvc5StarterKit.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
         // POST: /Account/SendCode
         [HttpPost]
         [AllowAnonymous]
@@ -369,7 +406,6 @@ namespace Mvc5StarterKit.Controllers
             return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
-        //
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
@@ -399,7 +435,6 @@ namespace Mvc5StarterKit.Controllers
             }
         }
 
-        //
         // POST: /Account/ExternalLoginConfirmation
         [HttpPost]
         [AllowAnonymous]
@@ -437,7 +472,6 @@ namespace Mvc5StarterKit.Controllers
             return View(model);
         }
 
-        //
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -447,7 +481,6 @@ namespace Mvc5StarterKit.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //
         // GET: /Account/ExternalLoginFailure
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
@@ -519,7 +552,9 @@ namespace Mvc5StarterKit.Controllers
             }
 
             public string LoginProvider { get; set; }
+
             public string RedirectUri { get; set; }
+
             public string UserId { get; set; }
 
             public override void ExecuteResult(ControllerContext context)

@@ -3,13 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Mvc5StarterKit.IzendaBoundary
 {
     public static class IzendaUtilities
     {
-        public static async Task CreateTenant(string tenantName, string authToken)
+        #region Methods
+        /// <summary>
+        /// Create a tenant
+        /// For more information, please refer to https://www.izenda.com/docs/ref/api_tenant.html#tenant-apis
+        /// </summary>
+        public static async Task CreateTenant(string tenantName, string tenantId, string authToken)
         {
             var existingTenant = await GetIzendaTenantByName(tenantName, authToken);
             if (existingTenant != null)
@@ -20,16 +24,17 @@ namespace Mvc5StarterKit.IzendaBoundary
                 Active = true,
                 Disable = false,
                 Name = tenantName,
-                TenantId = tenantName
+                TenantId = tenantId
             };
 
+            // For more information, please refer to https://www.izenda.com/docs/ref/api_tenant.html#post-tenant
             await WebApiService.Instance.PostAsync("tenant", tenantDetail, authToken);
         }
 
         public static async Task<RoleDetail> CreateRole(string roleName, TenantDetail izendaTenant, string authToken)
         {
-            var role = await GetIzendaRoleByTenantAndName(izendaTenant !=null? (Guid?)izendaTenant.Id : null, roleName, authToken);
-            if(role == null)
+            var role = await GetIzendaRoleByTenantAndName(izendaTenant != null ? (Guid?)izendaTenant.Id : null, roleName, authToken);
+            if (role == null)
             {
                 role = new RoleDetail
                 {
@@ -46,7 +51,7 @@ namespace Mvc5StarterKit.IzendaBoundary
 
             return role;
         }
-        
+
         /// <summary>
         /// Adds the user to the Izenda database
         /// See the link below for more details:
@@ -58,7 +63,7 @@ namespace Mvc5StarterKit.IzendaBoundary
         /// <param name="authToken">the authentication token</param>
         /// <returns>true if the operation was successful, false otherwise</returns>
         public static async Task<bool> CreateIzendaUser(Mvc5StarterKit.Models.ApplicationUser appUser, string roleId, string authToken)
-        {    
+        {
             var izendaTenant = appUser.Tenant != null ? await GetIzendaTenantByName(appUser.Tenant.Name, authToken) : null;
 
             var izendaUser = new UserDetail
@@ -82,7 +87,7 @@ namespace Mvc5StarterKit.IzendaBoundary
 
             return success;
         }
-        
+
         [Obsolete("This method is deprecated, please use CreateIzendaUser instead")]
         public static async Task<UserDetail> CreateUser(Mvc5StarterKit.Models.ApplicationUser hostingUser, string roleName, string authToken)
         {
@@ -125,6 +130,7 @@ namespace Mvc5StarterKit.IzendaBoundary
                 return tenants.FirstOrDefault(x => x.Name.Equals(tenantName, StringComparison.InvariantCultureIgnoreCase));
 
             return null;
-        }
+        } 
+        #endregion
     }
 }
