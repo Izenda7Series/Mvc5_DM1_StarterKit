@@ -160,7 +160,7 @@ namespace Mvc5StarterKit.Controllers
                 AddErrors(result);
             }
 
-            return FailedUserCreateAction(model, _unknownFailureMessage);
+            return FailedUserCreateAction(model, _defaultUserFailureMessage);
         }
 
         private ActionResult FailedUserCreateAction(CreateUserViewModel model, string message)
