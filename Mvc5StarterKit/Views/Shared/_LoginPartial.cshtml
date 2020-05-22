@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+@using System.Web.Mvc;
 @if (Request.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
@@ -7,11 +8,14 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li>
-                @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+                @*If manage account can be handled here, you can uncomment below line and customize it*@
+                @*@Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })*@
+
+                <a>Hello, @User.Identity.GetUserName()!</a>
             </li>
 
             @*Further works: Need to set up a condition for allowed user(s) to manager create user/ tenant
-                For now, only for system admin. Please update this condition*@
+                For now, only for system admin. Please update this condition. Check User Information whether System Admin or not*@
             @if (User.Identity.GetUserName().Equals("IzendaAdmin@system.com"))
             {
                 <li class="dropdown">

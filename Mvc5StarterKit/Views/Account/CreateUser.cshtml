@@ -39,9 +39,11 @@
                                     listItems.Add(new SelectListItem { Text = tenant });
                                 }
                             }
-
-                            @Html.DropDownListFor(m => m.SelectedTenant, listItems, "Select Tenant", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(m => m.SelectedTenant, "", new { @class = "text-danger" })
+                            @if (listItems.Any())
+                            {
+                                @Html.DropDownListFor(m => m.SelectedTenant, listItems, "Select Tenant", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.SelectedTenant, "", new { @class = "text-danger" })
+                            }
                         </div>
                     </div>
                 </div>
