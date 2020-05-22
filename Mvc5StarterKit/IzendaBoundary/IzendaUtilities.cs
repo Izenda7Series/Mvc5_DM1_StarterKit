@@ -58,7 +58,7 @@ namespace Mvc5StarterKit.IzendaBoundary
 
         /// <summary>
         /// Create a user
-        /// For more information, please refer to https://www.izenda.com/docs/ref/api_user.html?highlight=user%20integration#post-user-integration-saveuser
+        /// For more information, please refer to https://www.izenda.com/docs/ref/api_user.html#post-user-integration-saveuser
         /// </summary>
         public static async Task<bool> CreateIzendaUser(Mvc5StarterKit.Models.ApplicationUser appUser, string roleName, string authToken)
         {
@@ -72,7 +72,7 @@ namespace Mvc5StarterKit.IzendaBoundary
                 TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
                 TenantId = izendaTenant != null ? (Guid?)izendaTenant.Id : null,
                 InitPassword = true,
-                Active = false
+                Active = true
             };
 
             if (!string.IsNullOrWhiteSpace(roleName))

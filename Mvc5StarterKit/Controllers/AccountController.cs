@@ -17,7 +17,8 @@ namespace Mvc5StarterKit.Controllers
         private ApplicationUserManager _userManager;
         private ApplicationRoleManager _roleManager;
 
-        private static readonly string _defaultTenantFailureMessage = "Can't creat a new tenant. The tenant name or id already exists. Please use a different tenant name.";
+        private static readonly string _defaultTenantFailureMessage = "Can't creat a new tenant. The tenant name or id already exists.";
+        private static readonly string _defaultUserFailureMessage = "Can't create a new user. The user name or id already exists.";
         private static readonly string _unknownFailureMessage = "Unknown failure.";
         #endregion
 
@@ -109,10 +110,11 @@ namespace Mvc5StarterKit.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl = null)
         {
+            var tenantManager = new Managers.TenantManager();
+            model.Tenants = tenantManager.GetAllTenant(); // prevent null exception when redirected
+            
             if (ModelState.IsValid)
             {
-                var tenantManager = new Managers.TenantManager();
-
                 int? tenantId = null;
 
                 if (model.SelectedTenant != null)
@@ -127,26 +129,43 @@ namespace Mvc5StarterKit.Controllers
 
                 var result = await UserManager.CreateAsync(user);
 
-                var assignedRole = "Employee";
-
-                if (RoleManager.RoleExists(assignedRole))
-                    result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
-                else
-                    assignedRole = null;
-
                 if (result.Succeeded)
                 {
-                    var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
-                    user.Tenant = tenantManager.GetTenantByName(model.SelectedTenant);
+                    var assignedRole = "Employee"; // set default role if required
 
-                    await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRole, izendaAdminAuthToken);
+                    if (RoleManager.RoleExists(assignedRole))
+                        result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
+                    else
+                        assignedRole = null;
 
-                    return RedirectToAction("Index", "Home");
+                    if (result.Succeeded)
+                    {
+                        var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
+                        user.Tenant = tenantManager.GetTenantByName(model.SelectedTenant);
+
+                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRole, izendaAdminAuthToken);
+
+                        if (success)
+                        {
+                            TempData["SuccessMessage"] = "User has been created successfully";
+                            return View(model);
+                        }
+                        else
+                            FailedUserCreateAction(model, _defaultUserFailureMessage);
+                    }
                 }
+                else
+                    FailedUserCreateAction(model, _defaultUserFailureMessage);
 
                 AddErrors(result);
             }
 
+            return FailedUserCreateAction(model, _unknownFailureMessage);
+        }
+
+        private ActionResult FailedUserCreateAction(CreateUserViewModel model, string message)
+        {
+            TempData["WarningMessage"] = message;
             return View(model);
         }
 
@@ -196,18 +215,18 @@ namespace Mvc5StarterKit.Controllers
                     }
                     else
                         // Izenda DB has the same tenant name. Display Message at CreateTenant.cshtml
-                        return FailedTenantAction(model, _defaultTenantFailureMessage);
+                        return FailedTenantCreateAction(model, _defaultTenantFailureMessage);
                 }
                 else
                     // user DB has the same tenant name. Display Message at CreateTenant.cshtml
-                    return FailedTenantAction(model, _defaultTenantFailureMessage);
+                    return FailedTenantCreateAction(model, _defaultTenantFailureMessage);
             }
 
             // If we got this far, something failed, re-display form
-            return FailedTenantAction(model, _unknownFailureMessage);
+            return FailedTenantCreateAction(model, _unknownFailureMessage);
         }
 
-        private ActionResult FailedTenantAction(CreateTenantViewModel model, string message)
+        private ActionResult FailedTenantCreateAction(CreateTenantViewModel model, string message)
         {
             TempData["WarningMessage"] = message;
             return View(model);

@@ -3,16 +3,26 @@
 
 <h2>@ViewBag.Title</h2>
 
-<script>
-  alert(@TempData["Message"]);
-</script>
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissable">
+        <strong>@TempData["WarningMessage"]</strong>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissable">
+        <strong>@TempData["SuccessMessage"]</strong>
+    </div>
+}
 
 <div class="row">
     <div class="col-md-8">
         <section id="CreateUserForm">
             @using (Html.BeginForm("CreateUser", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
-                 @Html.AntiForgeryToken()
+                @Html.AntiForgeryToken()
 
                 <h4>Create a new user</h4>
                 <hr />
