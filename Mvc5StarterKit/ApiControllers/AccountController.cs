@@ -1,39 +1,30 @@
-﻿using Mvc5StarterKit.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using Mvc5StarterKit.Models;
 using Mvc5StarterKit.Providers;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
 
 namespace Mvc5StarterKit.ApiControllers
 {
     [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
+        #region Variables
         private ApplicationUserManager _userManager;
+        #endregion
 
-        public AccountController()
-        {
-        }
-
-        public AccountController(ApplicationUserManager userManager,
-            ISecureDataFormat<AuthenticationTicket> accessTokenFormat)
-        {
-            UserManager = userManager;
-        }
-
+        #region Properties
         public ApplicationUserManager UserManager
         {
             get
@@ -44,8 +35,20 @@ namespace Mvc5StarterKit.ApiControllers
             {
                 _userManager = value;
             }
-        }
+        } 
+        #endregion
 
+        #region CTOR
+        public AccountController()
+        { }
+
+        public AccountController(ApplicationUserManager userManager, ISecureDataFormat<AuthenticationTicket> accessTokenFormat)
+        {
+            UserManager = userManager;
+        }
+        #endregion
+
+        #region Methods
         [HttpGet]
         [Route("validateIzendaAuthToken")]
         public UserInfo ValidateIzendaAuthToken(string access_token)
@@ -61,10 +64,9 @@ namespace Mvc5StarterKit.ApiControllers
         {
             var userInfo = IzendaBoundary.IzendaTokenAuthorization.DecryptIzendaAuthenticationMessage(message);
             var token = IzendaBoundary.IzendaTokenAuthorization.GetToken(userInfo);
-            //return token;
+
             return Ok(new { Token = token });
         }
-
 
         // GET api/Account/ExternalLogin
         [OverrideAuthentication]
@@ -121,8 +123,8 @@ namespace Mvc5StarterKit.ApiControllers
             }
 
             return Ok();
-        }
-
+        } 
+        #endregion
 
         #region Helpers
 
@@ -231,6 +233,4 @@ namespace Mvc5StarterKit.ApiControllers
             }
         }
     }
-
-
 }
