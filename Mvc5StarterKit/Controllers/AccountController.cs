@@ -16,6 +16,9 @@ namespace Mvc5StarterKit.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private ApplicationRoleManager _roleManager;
+
+        private static readonly string _defaultTenantFailureMessage = "Can't creat a new tenant. The tenant name or id already exists. Please use a different tenant name.";
+        private static readonly string _unknownFailureMessage = "Unknown failure.";
         #endregion
 
         #region Properties
@@ -175,7 +178,7 @@ namespace Mvc5StarterKit.Controllers
                 var manager = new Managers.TenantManager();
                 var tenantName = model.TenantName;
 
-                var isTenantExist = manager.GetTenantByName(tenantName);
+                var isTenantExist = manager.GetTenantByName(tenantName); // check user DB first
 
                 if (isTenantExist == null)
                 {
@@ -188,24 +191,25 @@ namespace Mvc5StarterKit.Controllers
                         var newTenant = new Tenant() { Name = tenantName };
                         await manager.SaveTenantAsync(newTenant);
 
-                        //return RedirectToAction("Index", "Home");
                         TempData["SuccessMessage"] = "Tenant has been created successfully";
                         return View(model);
                     }
                     else
-                        return FailedTenantAction(model); // Izenda DB has the same tenant name. Display Message at CreateTenant.cshtml
+                        // Izenda DB has the same tenant name. Display Message at CreateTenant.cshtml
+                        return FailedTenantAction(model, _defaultTenantFailureMessage);
                 }
                 else
-                    return FailedTenantAction(model); // user DB has the same tenant name. Display Message at CreateTenant.cshtml
+                    // user DB has the same tenant name. Display Message at CreateTenant.cshtml
+                    return FailedTenantAction(model, _defaultTenantFailureMessage);
             }
 
             // If we got this far, something failed, re-display form
-            return FailedTenantAction(model);
+            return FailedTenantAction(model, _unknownFailureMessage);
         }
 
-        private ActionResult FailedTenantAction(CreateTenantViewModel model)
+        private ActionResult FailedTenantAction(CreateTenantViewModel model, string message)
         {
-            TempData["WarningMessage"] = "Can't creat a new tenant. The tenant name or id already exists. Please use a different tenant name";
+            TempData["WarningMessage"] = message;
             return View(model);
         }
 
