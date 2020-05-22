@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Mvc5StarterKit.Models
+﻿namespace Mvc5StarterKit.Models
 {
     public class UserInfo
     {
+        #region Properties
         public string UserName { get; set; }
-        public string TenantUniqueName { get; set; }
+
+        public string TenantUniqueName { get; set; } 
+        #endregion
     }
 }

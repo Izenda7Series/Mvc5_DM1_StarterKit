@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Mvc5StarterKit.Controllers
 {
     public class HomeController : Controller
     {
+        #region Base Actions
         public ActionResult Index()
         {
             return View();
@@ -26,10 +25,10 @@ namespace Mvc5StarterKit.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
-        }
+        } 
+        #endregion
 
         #region Izenda Actions
-
         [Route("izenda/settings")]
         [Route("izenda/new")]
         [Route("izenda/dashboard")]
@@ -42,7 +41,6 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //[Route("izendasetting")]
         public ActionResult Settings()
         {
             return View();

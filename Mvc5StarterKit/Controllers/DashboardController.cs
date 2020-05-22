@@ -7,6 +7,7 @@ namespace Mvc5StarterKit.Controllers
 {
     public class DashboardController : Controller
     {
+        #region Methods
         // GET: DashboardViewer
         public ActionResult DashboardViewer(string id)
         {
@@ -20,6 +21,7 @@ namespace Mvc5StarterKit.Controllers
             ViewBag.Id = id;
             ViewBag.filters = JsonConvert.SerializeObject(filters);
             return View();
-        }
+        } 
+        #endregion
     }
 }
