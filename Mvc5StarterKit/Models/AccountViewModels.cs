@@ -66,6 +66,29 @@ namespace Mvc5StarterKit.Models
         public bool RememberMe { get; set; }
     }
 
+    public class CreateUserViewModel
+    {
+        [Display(Name = "Tenant")]
+        public IEnumerable<string> Tenants { get; set; }
+
+        [Required]
+        [Display(Name = "Selected Tenant")]
+        public string SelectedTenant { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "User ID")]
+        public string UserID { get; set; }
+
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+    }
+
     public class CreateTenantViewModel
     {
         [Required]

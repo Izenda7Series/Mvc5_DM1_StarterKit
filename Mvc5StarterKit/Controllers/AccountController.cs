@@ -12,21 +12,13 @@ namespace Mvc5StarterKit.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        #region Variables
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private ApplicationRoleManager _roleManager;
+        #endregion
 
-        public AccountController()
-        {
-        }
-
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ApplicationRoleManager roleManager)
-        {
-            UserManager = userManager;
-            SignInManager = signInManager;
-            RoleManager = roleManager;
-        }
-
+        #region Properties
         public ApplicationSignInManager SignInManager
         {
             get
@@ -62,7 +54,21 @@ namespace Mvc5StarterKit.Controllers
                 _roleManager = value;
             }
         }
+        #endregion
 
+        #region CTOR
+        public AccountController()
+        { }
+
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ApplicationRoleManager roleManager)
+        {
+            UserManager = userManager;
+            SignInManager = signInManager;
+            RoleManager = roleManager;
+        }
+        #endregion
+
+        #region Methods
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
@@ -94,12 +100,67 @@ namespace Mvc5StarterKit.Controllers
             }
         }
 
+        // POST: /Account/CreateUser
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                var tenantManager = new Managers.TenantManager();
+
+                int? tenantId = null;
+
+                if (model.SelectedTenant != null)
+                    tenantId = tenantManager.GetTenantByName(model.SelectedTenant).Id;
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserID,
+                    Email = model.UserID,
+                    Tenant_Id = tenantId,
+                };
+
+                var result = await UserManager.CreateAsync(user);
+
+                var assignedRole = "Employee";
+
+                if (RoleManager.RoleExists(assignedRole))
+                    result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
+                else
+                    assignedRole = null;
+
+                if (result.Succeeded)
+                {
+                    var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
+                    user.Tenant = tenantManager.GetTenantByName(model.SelectedTenant);
+
+                    await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRole, izendaAdminAuthToken);
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                AddErrors(result);
+            }
+
+            return View(model);
+        }
+
         // GET: /Account/CreateUser
         [AllowAnonymous]
         public ActionResult CreateUser()
         {
             ViewBag.ReturnUrl = null;
-            return View();
+            ViewBag.Title = "Create User";
+
+            var createUserViewModel = new CreateUserViewModel();
+            var tenantManager = new Managers.TenantManager();
+            var tenants = tenantManager.GetAllTenant();
+
+            createUserViewModel.Tenants = tenants;
+
+            return View(createUserViewModel);
         }
 
         // POST: /Account/CreateTenant
@@ -111,32 +172,40 @@ namespace Mvc5StarterKit.Controllers
             if (ModelState.IsValid)
             {
                 var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
-                
-                // these two variables are [Required]
-                var tenantId = model.TenantID;
+                var manager = new Managers.TenantManager();
                 var tenantName = model.TenantName;
 
-                var newTenant = new Tenant() { Name = tenantName };
-                var tenantManager = new Managers.TenantManager();
-                var isTenantExist = tenantManager.GetTenantByName(model.TenantName);
+                var isTenantExist = manager.GetTenantByName(tenantName);
 
                 if (isTenantExist == null)
                 {
-                    // save a new tenant at user DB
-                    await tenantManager.SaveTenantAsync(newTenant);
+                    // try to create a new tenant at izenda DB
+                    var success = await IzendaBoundary.IzendaUtilities.CreateTenant(tenantName, model.TenantID, izendaAdminAuthToken);
 
-                    // create a new tenant at izenda DB
-                    await IzendaBoundary.IzendaUtilities.CreateTenant(tenantName, tenantId, izendaAdminAuthToken);
-                    
-                    return RedirectToAction("Index", "Home");
+                    if (success)
+                    {
+                        // save a new tenant at user DB
+                        var newTenant = new Tenant() { Name = tenantName };
+                        await manager.SaveTenantAsync(newTenant);
+
+                        //return RedirectToAction("Index", "Home");
+                        TempData["SuccessMessage"] = "Tenant has been created successfully";
+                        return View(model);
+                    }
+                    else
+                        return FailedTenantAction(model); // Izenda DB has the same tenant name. Display Message at CreateTenant.cshtml
                 }
                 else
-                {
-                    return Content("Can't create a new Tenant. The Tenant already exists");
-                }
+                    return FailedTenantAction(model); // user DB has the same tenant name. Display Message at CreateTenant.cshtml
             }
 
-            // If we got this far, something failed, redisplay form
+            // If we got this far, something failed, re-display form
+            return FailedTenantAction(model);
+        }
+
+        private ActionResult FailedTenantAction(CreateTenantViewModel model)
+        {
+            TempData["WarningMessage"] = "Can't creat a new tenant. The tenant name or id already exists. Please use a different tenant name";
             return View(model);
         }
 
@@ -145,6 +214,8 @@ namespace Mvc5StarterKit.Controllers
         public ActionResult CreateTenant()
         {
             ViewBag.ReturnUrl = null;
+            ViewBag.Title = "Create Tenant";
+
             return View();
         }
 
@@ -189,7 +260,6 @@ namespace Mvc5StarterKit.Controllers
             }
         }
 
-        //
         // GET: /Account/Register
         [AllowAnonymous]
         public ActionResult Register()
@@ -197,8 +267,10 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Register
+        /// <summary>
+        /// DM1 kit does not support registration function currently
+        /// Leave this method only for reference or future usage
+        /// </summary>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -215,13 +287,13 @@ namespace Mvc5StarterKit.Controllers
                 else
                     tenant = tenant != null ? await tenantManager.SaveTenantAsync(tenant) : null;
 
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Tenant_Id = tenant !=null ? (int?)tenant.Id : null };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Tenant_Id = tenant != null ? (int?)tenant.Id : null };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 //If role = "Employee" => add user to this role
 
                 string assignedRole = "Employee";
                 string assignedRoleId = "";
-                
+
                 if (RoleManager.RoleExists(assignedRole))
                 {
                     result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
@@ -238,7 +310,7 @@ namespace Mvc5StarterKit.Controllers
                     ////izenda
                     var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
 
-                    if(tenant != null)
+                    if (tenant != null)
                         await IzendaBoundary.IzendaUtilities.CreateTenant(tenant.Name, tenant.Name, izendaAdminAuthToken);
 
                     //CreateUser is Deprecated in favor of CreateIzendaUser
@@ -247,7 +319,7 @@ namespace Mvc5StarterKit.Controllers
 
                     /// end izenda
 
-                    
+
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
@@ -507,6 +579,7 @@ namespace Mvc5StarterKit.Controllers
 
             base.Dispose(disposing);
         }
+        #endregion
 
         #region Helpers
         // Used for XSRF protection when adding external logins

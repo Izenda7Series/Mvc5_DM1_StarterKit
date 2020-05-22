@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,6 +15,21 @@ namespace Mvc5StarterKit.Managers
                 var tenant = context.Tenants.Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
 
                 return tenant;
+            }
+        }
+
+        public IEnumerable<string> GetAllTenant()
+        {
+            using (var context = Models.ApplicationDbContext.Create())
+            {
+                var tenantList = new List<string>();
+
+                foreach (var tenant in context.Tenants)
+                {
+                    tenantList.Add(tenant.Name);
+                }
+
+                return tenantList;
             }
         }
 

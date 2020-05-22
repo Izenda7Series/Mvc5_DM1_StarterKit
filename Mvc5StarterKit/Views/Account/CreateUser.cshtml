@@ -1,7 +1,82 @@
-﻿
-@{
-    ViewBag.Title = "CreateUser";
+﻿@using Mvc5StarterKit.Models
+@model CreateUserViewModel
+
+<h2>@ViewBag.Title</h2>
+
+<script>
+  alert(@TempData["Message"]);
+</script>
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="CreateUserForm">
+            @using (Html.BeginForm("CreateUser", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                 @Html.AntiForgeryToken()
+
+                <h4>Create a new user</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Tenants, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        <div class="dropdown">
+                            @{
+                                List<SelectListItem> listItems = new List<SelectListItem>();
+                                foreach (var tenant in Model.Tenants)
+                                {
+                                    listItems.Add(new SelectListItem { Text = tenant });
+                                }
+                            }
+
+                            @Html.DropDownListFor(m => m.SelectedTenant, listItems, "Select Tenant", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SelectedTenant, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.UserID, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.UserID, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.UserID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.FirstName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.LastName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section id="userInstruction">
+            <div>
+                <h4>Further Instruction</h4>
+                <hr />
+                <p>
+                    If you want to add "Email", or update "TimeZone", "Timestamp Offset", "Language", and "Date Format" for a newly created user, please go to Settings &#8594 User Setup and update it.
+                </p>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
 }
-
-<h2>CreateUser</h2>
-
