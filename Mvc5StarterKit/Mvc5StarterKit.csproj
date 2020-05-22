@@ -312,7 +312,9 @@
     <Content Include="Views\Account\CreateTenant.cshtml" />
     <Content Include="Views\Account\CreateUser.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Scripts\izenda\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
