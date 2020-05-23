@@ -1,10 +1,10 @@
-﻿using System.Data.Entity;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Mvc5StarterKit.Models
 {
@@ -31,7 +31,6 @@ namespace Mvc5StarterKit.Models
             if(role !=null)
                 userIdentity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, role));
 
-
             // Add custom user claims here
             return userIdentity;
         }
@@ -40,7 +39,8 @@ namespace Mvc5StarterKit.Models
     public class Tenant
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+
+        public string Name { get; set; } 
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

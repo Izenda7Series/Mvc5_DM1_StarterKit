@@ -1,0 +1,66 @@
+﻿@using Mvc5StarterKit.Models
+@model CreateTenantViewModel
+
+<h2>@ViewBag.Title</h2>
+
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissable">
+        <strong>@TempData["WarningMessage"]</strong>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissable">
+        <strong>@TempData["SuccessMessage"]</strong>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="CreateTenantForm">
+            @using (Html.BeginForm("CreateTenant", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Create a new tenant</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TenantID, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.TenantID, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.TenantID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TenantName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.TenantName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.TenantName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section id="tenantIntruction">
+            <div>
+                <h4>Further Instruction</h4>
+                <hr />
+                <p>
+                    If you want to add "Description" or enable a Module(s) to a newly created tenant, please go to Settings &#8594 Tenant Setup and update it.
+                </p>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

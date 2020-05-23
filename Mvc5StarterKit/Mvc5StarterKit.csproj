@@ -208,7 +208,6 @@
     <Compile Include="IzendaBoundary\Models\UserDetail.cs" />
     <Compile Include="IzendaBoundary\StringCipher.cs" />
     <Compile Include="IzendaBoundary\WebApiService.cs" />
-    <Compile Include="IzendaConfig.cs" />
     <Compile Include="Managers\TenantManager.cs" />
     <Compile Include="Migrations\201611282113545_InitialCreate.cs" />
     <Compile Include="Migrations\201611282113545_InitialCreate.Designer.cs">
@@ -310,10 +309,11 @@
     <None Include="Views\Dashboard\DashboardViewer.cshtml" />
     <Content Include="Views\Report\AdvancedReportParts.cshtml" />
     <Content Include="Views\Home\IframeViewer.cshtml" />
+    <Content Include="Views\Account\CreateTenant.cshtml" />
+    <Content Include="Views\Account\CreateUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\izenda\" />
-    <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

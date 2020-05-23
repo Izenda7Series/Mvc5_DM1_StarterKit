@@ -26,7 +26,6 @@ namespace Mvc5StarterKit.Migrations
             //      new Person { FullName = "Brice Lambson" },
             //      new Person { FullName = "Rowan Miller" }
             //    );
-            //
         }
     }
 }
