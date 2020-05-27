@@ -66,10 +66,6 @@ namespace Mvc5StarterKit.IzendaBoundary
         {
             var izendaTenant = user.SelectedTenant != null ? await GetIzendaTenantByName(user.SelectedTenant, authToken) : null;
 
-            bool isSystemAdmin = false;
-            if (izendaTenant == null && user.IsAdmin)
-                isSystemAdmin = true;
-
             var izendaUser = new UserDetail
             {
                 Username = user.UserID,
@@ -78,7 +74,7 @@ namespace Mvc5StarterKit.IzendaBoundary
                 FirstName = user.FirstName,
                 TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
                 InitPassword = false,
-                SystemAdmin = isSystemAdmin,
+                SystemAdmin = user.IsAdmin,
                 Active = true
             };
 
