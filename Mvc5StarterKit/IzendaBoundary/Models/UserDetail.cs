@@ -10,6 +10,8 @@ namespace Mvc5StarterKit.IzendaBoundary.Models
         #endregion
 
         #region Properties
+        public bool SystemAdmin { get; set; }
+
         public string Username { get; set; }
 
         public string TenantDisplayId { get; set; }

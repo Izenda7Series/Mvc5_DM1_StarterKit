@@ -31,7 +31,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Tenants, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
-                        <div class="dropdown">
+                        <div class="dropdown" id="tenantList">
                             @{
                                 List<SelectListItem> listItems = new List<SelectListItem>();
                                 foreach (var tenant in Model.Tenants)
@@ -41,9 +41,16 @@
                             }
                             @if (listItems.Any())
                             {
-                                @Html.DropDownListFor(m => m.SelectedTenant, listItems, "Select Tenant", new { @class = "form-control" })
-                                @Html.ValidationMessageFor(m => m.SelectedTenant, "", new { @class = "text-danger" })
+                                @Html.DropDownListFor(m => m.SelectedTenant, listItems, "Select Tenant", new { @class = "form-control", @onChange = "SelectionChange()" })
                             }
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="isAdminCheckbox">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox" >
+                            @Html.CheckBoxFor(m => m.IsAdmin)
+                            @Html.LabelFor(m => m.IsAdmin)
                         </div>
                     </div>
                 </div>
@@ -84,6 +91,9 @@
                 <p>
                     If you want to add "Email", or update "TimeZone", "Timestamp Offset", "Language", and "Date Format" for a newly created user, please go to Settings &#8594 User Setup and update it.
                 </p>
+                <p>
+                    *If you don't select tenant, it will create a user under system level.
+                </p>
             </div>
         </section>
     </div>
@@ -91,4 +101,19 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        function SelectionChange() {
+            var selectedTenant = $("#tenantList option:selected").val();
+
+            if (selectedTenant === "") {
+                console.log("System level. No tenant");
+                $("#isAdminCheckbox").show();
+            }
+            else {
+                console.log(selectedTenant);
+                $("#isAdminCheckbox").hide();
+            }
+        }
+    </script>
 }
