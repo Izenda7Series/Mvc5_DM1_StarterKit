@@ -74,10 +74,10 @@ namespace Mvc5StarterKit.IzendaBoundary
         }
 
         /// <summary>
-        /// POST Tenant only
+        /// POST Tenant / User
         /// Return result as boolean value
         /// </summary>
-        public async Task<bool> PostTenantAsync<T>(string action, T data, string authToken = null)
+        public async Task<bool> PostReturnBooleanAsync<T>(string action, T data, string authToken = null)
         {
             using (var httpClient = GetHttpClient(authToken))
             {

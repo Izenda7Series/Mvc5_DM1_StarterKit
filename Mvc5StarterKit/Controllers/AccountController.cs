@@ -19,7 +19,7 @@ namespace Mvc5StarterKit.Controllers
 
         private static readonly string _defaultTenantFailureMessage = "Can't creat a new tenant. The tenant name or id already exists.";
         private static readonly string _defaultUserFailureMessage = "Can't create a new user. The user name or id already exists.";
-        private static readonly string _unknownFailureMessage = "Unknown failure.";
+        private static readonly string _unknownFailureMessage = "Server does not allow your request.";
         #endregion
 
         #region Properties
@@ -143,7 +143,7 @@ namespace Mvc5StarterKit.Controllers
                         var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
                         user.Tenant = tenantManager.GetTenantByName(model.SelectedTenant);
 
-                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRole, izendaAdminAuthToken);
+                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(model, assignedRole, izendaAdminAuthToken);
 
                         if (success)
                         {
@@ -151,7 +151,7 @@ namespace Mvc5StarterKit.Controllers
                             return View(model);
                         }
                         else
-                            FailedUserCreateAction(model, _defaultUserFailureMessage);
+                            FailedUserCreateAction(model, _unknownFailureMessage);
                     }
                 }
                 else
@@ -338,7 +338,9 @@ namespace Mvc5StarterKit.Controllers
 
                     //CreateUser is Deprecated in favor of CreateIzendaUser
                     //await IzendaBoundary.IzendaUtilities.CreateUser(user, assignedRole, izendaAdminAuthToken);
-                    await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRoleId, izendaAdminAuthToken);
+
+                    // If you want to implement register, please update model too to match with signature of param. 
+                    //await IzendaBoundary.IzendaUtilities.CreateIzendaUser(user, assignedRoleId, izendaAdminAuthToken);
 
                     /// end izenda
 

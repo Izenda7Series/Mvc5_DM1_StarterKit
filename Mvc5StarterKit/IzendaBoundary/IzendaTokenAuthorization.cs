@@ -9,6 +9,8 @@ namespace Mvc5StarterKit.IzendaBoundary
         #warning Change this key!!
         const string KEY = "THISISKEY1234567"; //must be at least 16 characters long (128 bits)
 
+        private readonly static string IzendaAdminUserName = "IzendaAdmin@system.com";
+
         /// <summary>
         /// Generate token from UserInfo. Userinfo will be encrypted before sending to Izenda.
         /// </summary>
@@ -30,14 +32,7 @@ namespace Mvc5StarterKit.IzendaBoundary
         /// Get the token for IzendaAdmin user, to communicate with Izenda to process when user has not been logged in.
         /// </summary>
         /// <returns></returns>
-        public static string GetIzendaAdminToken()
-        {
-            var userName = ConfigurationManager.AppSettings["IzendaAdminUser"];
-
-            var user = new UserInfo { UserName = userName };
-            return GetToken(user);
-        }
-
+        public static string GetIzendaAdminToken() => GetToken(new UserInfo { UserName = IzendaAdminUserName });
 
         /// <summary>
         /// Get User info from token. Token, which recieved from Izenda, will be decrypted to get user info.

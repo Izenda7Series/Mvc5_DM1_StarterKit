@@ -1,4 +1,5 @@
 ﻿using Mvc5StarterKit.IzendaBoundary.Models;
+using Mvc5StarterKit.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Mvc5StarterKit.IzendaBoundary
             };
 
             // For more information, please refer to https://www.izenda.com/docs/ref/api_tenant.html#post-tenant
-            return await WebApiService.Instance.PostTenantAsync("tenant", tenantDetail, authToken);
+            return await WebApiService.Instance.PostReturnBooleanAsync("tenant", tenantDetail, authToken);
         }
 
         /// <summary>
@@ -58,20 +59,21 @@ namespace Mvc5StarterKit.IzendaBoundary
 
         /// <summary>
         /// Create a user
-        /// For more information, please refer to https://www.izenda.com/docs/ref/api_user.html#post-user-integration-saveuser
+        /// For more information, please refer to https://www.izenda.com/docs/ref/api_user.html#post-user
+        /// ATTN: please don't use this deprecated end point https://www.izenda.com/docs/ref/api_user.html#post-user-integration-saveuser
         /// </summary>
-        public static async Task<bool> CreateIzendaUser(Mvc5StarterKit.Models.ApplicationUser appUser, string roleName, string authToken)
+        public static async Task<bool> CreateIzendaUser(CreateUserViewModel user, string roleName, string authToken)
         {
-            var izendaTenant = appUser.Tenant != null ? await GetIzendaTenantByName(appUser.Tenant.Name, authToken) : null;
+            var izendaTenant = user.SelectedTenant != null ? await GetIzendaTenantByName(user.SelectedTenant, authToken) : null;
 
             var izendaUser = new UserDetail
             {
-                FirstName = izendaTenant != null ? izendaTenant.Name : string.Empty,
-                LastName = appUser.UserName.Split('@')[0],
-                Username = appUser.UserName,
-                TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
+                Username = user.UserID,
                 TenantId = izendaTenant != null ? (Guid?)izendaTenant.Id : null,
-                InitPassword = true,
+                LastName = user.LastName,
+                FirstName = user.FirstName,
+                TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
+                InitPassword = false,
                 Active = true
             };
 
@@ -81,7 +83,7 @@ namespace Mvc5StarterKit.IzendaBoundary
                 izendaUser.Roles.Add(izendaRole);
             }
 
-            bool success = await WebApiService.Instance.PostReturnValueAsync<bool, UserDetail>("user/integration/saveUser", izendaUser, authToken);
+            bool success = await WebApiService.Instance.PostReturnBooleanAsync("user", izendaUser, authToken);
 
             return success;
         }
