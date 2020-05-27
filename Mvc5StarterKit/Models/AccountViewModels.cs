@@ -71,7 +71,6 @@ namespace Mvc5StarterKit.Models
         [Display(Name = "Tenant")]
         public IEnumerable<string> Tenants { get; set; }
 
-        [Required]
         [Display(Name = "Selected Tenant")]
         public string SelectedTenant { get; set; }
 
