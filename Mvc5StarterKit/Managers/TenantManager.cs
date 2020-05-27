@@ -26,7 +26,8 @@ namespace Mvc5StarterKit.Managers
 
                 foreach (var tenant in context.Tenants)
                 {
-                    tenantList.Add(tenant.Name);
+                    if (!tenant.Name.Equals("System", StringComparison.InvariantCultureIgnoreCase))
+                        tenantList.Add(tenant.Name);
                 }
 
                 return tenantList;
