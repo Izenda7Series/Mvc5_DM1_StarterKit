@@ -120,7 +120,7 @@ namespace Mvc5StarterKit
 
         public async Task<bool> PasswordSigninAsync(string tenant, string username, string password, bool remember)
         {
-            var user = await (this.UserManager as ApplicationUserManager).FindTenantUserAsync(tenant, username, password);
+            var user = await (UserManager as ApplicationUserManager).FindTenantUserAsync(tenant, username, password);
 
             if (user != null)
             {

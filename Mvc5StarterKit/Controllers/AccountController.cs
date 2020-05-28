@@ -111,7 +111,7 @@ namespace Mvc5StarterKit.Controllers
         public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl = null)
         {
             var tenantManager = new Managers.TenantManager();
-            model.Tenants = tenantManager.GetAllTenant(); // prevent null exception when redirected
+            model.Tenants = tenantManager.GetAllTenants(); // prevent null exception when redirected
             
             if (ModelState.IsValid)
             {
@@ -181,7 +181,7 @@ namespace Mvc5StarterKit.Controllers
 
             var createUserViewModel = new CreateUserViewModel();
             var tenantManager = new Managers.TenantManager();
-            var tenants = tenantManager.GetAllTenant();
+            var tenants = tenantManager.GetAllTenants();
 
             createUserViewModel.Tenants = tenants;
 

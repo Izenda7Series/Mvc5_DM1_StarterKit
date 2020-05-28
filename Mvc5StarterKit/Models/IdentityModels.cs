@@ -13,6 +13,7 @@ namespace Mvc5StarterKit.Models
     {
         public int? Tenant_Id { get; set; }
         [ForeignKey("Tenant_Id")]
+
         public Tenant Tenant { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType = DefaultAuthenticationTypes.ApplicationCookie)
@@ -27,7 +28,9 @@ namespace Mvc5StarterKit.Models
                     new Claim("tenantId",Tenant.Id.ToString()),
                 });
             }
+
             var role = (await manager.GetRolesAsync(this.Id)).FirstOrDefault();
+          
             if(role !=null)
                 userIdentity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, role));
 

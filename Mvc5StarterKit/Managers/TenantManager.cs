@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mvc5StarterKit.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +9,9 @@ namespace Mvc5StarterKit.Managers
     public class TenantManager
     {
         #region Methods
-        public Models.Tenant GetTenantByName(string name)
+        public Tenant GetTenantByName(string name)
         {
-            using (var context = Models.ApplicationDbContext.Create())
+            using (var context = ApplicationDbContext.Create())
             {
                 var tenant = context.Tenants.Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
 
@@ -18,9 +19,9 @@ namespace Mvc5StarterKit.Managers
             }
         }
 
-        public IEnumerable<string> GetAllTenant()
+        public IEnumerable<string> GetAllTenants()
         {
-            using (var context = Models.ApplicationDbContext.Create())
+            using (var context = ApplicationDbContext.Create())
             {
                 var tenantList = new List<string>();
 
@@ -34,9 +35,9 @@ namespace Mvc5StarterKit.Managers
             }
         }
 
-        public async Task<Models.Tenant> SaveTenantAsync(Models.Tenant tenant)
+        public async Task<Tenant> SaveTenantAsync(Tenant tenant)
         {
-            using (var context = Models.ApplicationDbContext.Create())
+            using (var context = ApplicationDbContext.Create())
             {
                 context.Tenants.Add(tenant);
                 await context.SaveChangesAsync();
