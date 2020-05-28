@@ -207,8 +207,7 @@
     <Compile Include="IzendaBoundary\Models\TenantDetail.cs" />
     <Compile Include="IzendaBoundary\Models\UserDetail.cs" />
     <Compile Include="IzendaBoundary\StringCipher.cs" />
-    <Compile Include="IzendaBoundary\WebApiService.cs" />
-    <Compile Include="Managers\TenantManager.cs" />
+    <Compile Include="IzendaBoundary\WebAPIService.cs" />
     <Compile Include="Migrations\201611282113545_InitialCreate.cs" />
     <Compile Include="Migrations\201611282113545_InitialCreate.Designer.cs">
       <DependentUpon>201611282113545_InitialCreate.cs</DependentUpon>

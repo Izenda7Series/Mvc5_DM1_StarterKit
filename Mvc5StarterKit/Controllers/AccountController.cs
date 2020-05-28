@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using Mvc5StarterKit.IzendaBoundary;
 using Mvc5StarterKit.Models;
 using System.Linq;
 using System.Threading.Tasks;
@@ -110,8 +111,7 @@ namespace Mvc5StarterKit.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl = null)
         {
-            var tenantManager = new Managers.TenantManager();
-            model.Tenants = tenantManager.GetAllTenants(); // prevent null exception when redirected
+            model.Tenants = IzendaUtilities.GetAllTenants(); // prevent null exception when redirected
             
             if (ModelState.IsValid)
             {
@@ -119,7 +119,7 @@ namespace Mvc5StarterKit.Controllers
 
                 if (model.SelectedTenant != null)
                 {
-                    tenantId = tenantManager.GetTenantByName(model.SelectedTenant).Id;
+                    tenantId = IzendaUtilities.GetTenantByName(model.SelectedTenant).Id;
                     model.IsAdmin = false;
                 }
 
@@ -144,9 +144,16 @@ namespace Mvc5StarterKit.Controllers
                     if (result.Succeeded)
                     {
                         var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
-                        user.Tenant = tenantManager.GetTenantByName(model.SelectedTenant);
+                        user.Tenant = IzendaUtilities.GetTenantByName(model.SelectedTenant);
 
-                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(model, assignedRole, izendaAdminAuthToken);
+                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(
+                            model.SelectedTenant,
+                            model.UserID,
+                            model.LastName,
+                            model.FirstName,
+                            model.IsAdmin,
+                            assignedRole, 
+                            izendaAdminAuthToken);
 
                         if (success)
                         {
@@ -180,8 +187,7 @@ namespace Mvc5StarterKit.Controllers
             ViewBag.Title = "Create User";
 
             var createUserViewModel = new CreateUserViewModel();
-            var tenantManager = new Managers.TenantManager();
-            var tenants = tenantManager.GetAllTenants();
+            var tenants = IzendaUtilities.GetAllTenants();
 
             createUserViewModel.Tenants = tenants;
 
@@ -196,22 +202,21 @@ namespace Mvc5StarterKit.Controllers
         {
             if (ModelState.IsValid)
             {
-                var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
-                var manager = new Managers.TenantManager();
+                var izendaAdminAuthToken = IzendaTokenAuthorization.GetIzendaAdminToken();
                 var tenantName = model.TenantName;
 
-                var isTenantExist = manager.GetTenantByName(tenantName); // check user DB first
+                var isTenantExist = IzendaUtilities.GetTenantByName(tenantName); // check user DB first
 
                 if (isTenantExist == null)
                 {
                     // try to create a new tenant at izenda DB
-                    var success = await IzendaBoundary.IzendaUtilities.CreateTenant(tenantName, model.TenantID, izendaAdminAuthToken);
+                    var success = await IzendaUtilities.CreateTenant(tenantName, model.TenantID, izendaAdminAuthToken);
 
                     if (success)
                     {
                         // save a new tenant at user DB
                         var newTenant = new Tenant() { Name = tenantName };
-                        await manager.SaveTenantAsync(newTenant);
+                        await IzendaUtilities.SaveTenantAsync(newTenant);
 
                         TempData["SuccessMessage"] = "Tenant has been created successfully";
                         return View(model);
@@ -305,13 +310,12 @@ namespace Mvc5StarterKit.Controllers
             if (ModelState.IsValid)
             {
                 var tenant = !string.IsNullOrWhiteSpace(model.Tenant) ? new Tenant { Name = model.Tenant } : null;
-                var tenantManager = new Managers.TenantManager();
-                var exstingTenant = tenantManager.GetTenantByName(model.Tenant);
+                var exstingTenant = IzendaUtilities.GetTenantByName(model.Tenant);
 
                 if (exstingTenant != null)
                     tenant = exstingTenant;
                 else
-                    tenant = tenant != null ? await tenantManager.SaveTenantAsync(tenant) : null;
+                    tenant = tenant != null ? await IzendaUtilities.SaveTenantAsync(tenant) : null;
 
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Tenant_Id = tenant != null ? (int?)tenant.Id : null };
                 var result = await UserManager.CreateAsync(user, model.Password);

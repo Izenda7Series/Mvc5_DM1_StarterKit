@@ -6,16 +6,16 @@ namespace Mvc5StarterKit.IzendaBoundary
 {
     public class IzendaTokenAuthorization
     {
-        #warning Change this key!!
-        const string KEY = "THISISKEY1234567"; //must be at least 16 characters long (128 bits)
+        #region Constants
+        private const string KEY = "THISISKEY1234567"; //must be at least 16 characters long (128 bits)
 
         private readonly static string IzendaAdminUserName = "IzendaAdmin@system.com";
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Generate token from UserInfo. Userinfo will be encrypted before sending to Izenda.
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         public static string GetToken(UserInfo user)
         {
             // remove tenant property when sending token to Izenda, if Tenant is System.
@@ -23,28 +23,25 @@ namespace Mvc5StarterKit.IzendaBoundary
                 user.TenantUniqueName = null;
 
             var serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(user);
-
             var token = StringCipher.Encrypt(serializedObject, KEY);
+
             return token;
         }
 
         /// <summary>
-        /// Get the token for IzendaAdmin user, to communicate with Izenda to process when user has not been logged in.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetIzendaAdminToken() => GetToken(new UserInfo { UserName = IzendaAdminUserName });
-
-        /// <summary>
         /// Get User info from token. Token, which recieved from Izenda, will be decrypted to get user info.
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
         public static UserInfo GetUserInfo(string token)
         {
             var serializedObject = StringCipher.Decrypt(token, KEY);
             var user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserInfo>(serializedObject);
             return user;
         }
+
+        /// <summary>
+        /// Get the token for IzendaAdmin user, to communicate with Izenda to process when user has not been logged in.
+        /// </summary>
+        public static string GetIzendaAdminToken() => GetToken(new UserInfo { UserName = IzendaAdminUserName });
 
         public static UserInfo DecryptIzendaAuthenticationMessage(string encryptedMessage)
         {
@@ -138,5 +135,6 @@ namespace Mvc5StarterKit.IzendaBoundary
             binr.BaseStream.Seek(-1, System.IO.SeekOrigin.Current);
             return count;
         }
+        #endregion
     }
 }

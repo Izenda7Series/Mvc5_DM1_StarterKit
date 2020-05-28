@@ -1,15 +1,81 @@
-﻿using Mvc5StarterKit.IzendaBoundary.Models;
-using Mvc5StarterKit.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mvc5StarterKit.IzendaBoundary.Models;
+using Mvc5StarterKit.Models;
 
 namespace Mvc5StarterKit.IzendaBoundary
 {
     public static class IzendaUtilities
     {
+        #region Variables
+        private static Dictionary<string, int> _allTenants = new Dictionary<string, int>();
+        #endregion
+
         #region Methods
+        public static Tenant GetTenantByName(string name)
+        {
+            using (var context = ApplicationDbContext.Create())
+            {
+                var tenant = context.Tenants.Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
+
+                return tenant;
+            }
+        }
+
+        public static IEnumerable<string> GetAllTenants()
+        {
+            using (var context = ApplicationDbContext.Create())
+            {
+                var tenantList = new List<string>();
+
+                foreach (var tenant in context.Tenants)
+                {
+                    tenantList.Add(tenant.Name);
+                }
+
+                return tenantList;
+            }
+        }
+
+        public static Dictionary<string, int> AllTenants
+        {
+            get
+            {
+                if (_allTenants.Count > 0)
+                    return _allTenants;
+
+                using (var context = ApplicationDbContext.Create())
+                {
+                    _allTenants = context.Tenants.Select(x => x).ToDictionary(i => i.Name, i => i.Id);
+                }
+
+                return _allTenants;
+            }
+        }
+
+        public static Tenant GetTenantById(int id)
+        {
+            using (var context = ApplicationDbContext.Create())
+            {
+                var tenant = context.Tenants.Where(x => x.Id == id).SingleOrDefault();
+
+                return tenant;
+            }
+        }
+
+        public static async Task<Tenant> SaveTenantAsync(Tenant tenant)
+        {
+            using (var context = ApplicationDbContext.Create())
+            {
+                context.Tenants.Add(tenant);
+                await context.SaveChangesAsync();
+
+                return tenant;
+            }
+        }
+
         /// <summary>
         /// Create a tenant
         /// For more information, please refer to https://www.izenda.com/docs/ref/api_tenant.html#tenant-apis
@@ -29,12 +95,9 @@ namespace Mvc5StarterKit.IzendaBoundary
             };
 
             // For more information, please refer to https://www.izenda.com/docs/ref/api_tenant.html#post-tenant
-            return await WebApiService.Instance.PostReturnBooleanAsync("tenant", tenantDetail, authToken);
+            return await WebAPIService.Instance.PostReturnBooleanAsync("tenant", tenantDetail, authToken);
         }
 
-        /// <summary>
-        /// We are not supporting creating role here. TBD
-        /// </summary>
         public static async Task<RoleDetail> CreateRole(string roleName, TenantDetail izendaTenant, string authToken)
         {
             var role = await GetIzendaRoleByTenantAndName(izendaTenant != null ? (Guid?)izendaTenant.Id : null, roleName, authToken);
@@ -50,7 +113,7 @@ namespace Mvc5StarterKit.IzendaBoundary
                     TenantId = izendaTenant != null ? (Guid?)izendaTenant.Id : null
                 };
 
-                var response = await WebApiService.Instance.PostReturnValueAsync<AddRoleResponeMessage, RoleDetail>("role", role, authToken);
+                var response = await WebAPIService.Instance.PostReturnValueAsync<AddRoleResponeMessage, RoleDetail>("role", role, authToken);
                 role = response.Role;
             }
 
@@ -62,19 +125,19 @@ namespace Mvc5StarterKit.IzendaBoundary
         /// For more information, please refer to https://www.izenda.com/docs/ref/api_user.html#post-user
         /// ATTN: please don't use this deprecated end point https://www.izenda.com/docs/ref/api_user.html#post-user-integration-saveuser
         /// </summary>
-        public static async Task<bool> CreateIzendaUser(CreateUserViewModel user, string roleName, string authToken)
+        public static async Task<bool> CreateIzendaUser(string tenant, string userID, string lastName, string firstName, bool isAdmin, string roleName, string authToken)
         {
-            var izendaTenant = user.SelectedTenant != null ? await GetIzendaTenantByName(user.SelectedTenant, authToken) : null;
+            var izendaTenant = !string.IsNullOrEmpty(tenant) ? await GetIzendaTenantByName(tenant, authToken) : null;
 
             var izendaUser = new UserDetail
             {
-                Username = user.UserID,
+                Username = userID,
                 TenantId = izendaTenant != null ? (Guid?)izendaTenant.Id : null,
-                LastName = user.LastName,
-                FirstName = user.FirstName,
+                LastName = lastName,
+                FirstName = firstName,
                 TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
                 InitPassword = false,
-                SystemAdmin = user.IsAdmin,
+                SystemAdmin = isAdmin,
                 Active = true
             };
 
@@ -84,26 +147,26 @@ namespace Mvc5StarterKit.IzendaBoundary
                 izendaUser.Roles.Add(izendaRole);
             }
 
-            bool success = await WebApiService.Instance.PostReturnBooleanAsync("user", izendaUser, authToken);
+            bool success = await WebAPIService.Instance.PostReturnBooleanAsync("user", izendaUser, authToken);
 
             return success;
         }
 
-        private static async Task<RoleDetail> GetIzendaRoleByTenantAndName(Guid? tenantId, string roleName, string authToken)
+        private static async Task<TenantDetail> GetIzendaTenantByName(string tenantName, string authToken)
         {
-            var roles = await WebApiService.Instance.GetAsync<IList<RoleDetail>>("/role/all/" + (tenantId.HasValue ? tenantId.ToString() : null), authToken);
-
-            if (roles != null)
-                return roles.FirstOrDefault(r => r.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase));
+            var tenants = await WebAPIService.Instance.GetAsync<IList<TenantDetail>>("/tenant/allTenants", authToken);
+            if (tenants != null)
+                return tenants.FirstOrDefault(x => x.Name.Equals(tenantName, StringComparison.InvariantCultureIgnoreCase));
 
             return null;
         }
 
-        private static async Task<TenantDetail> GetIzendaTenantByName(string tenantName, string authToken)
+        private static async Task<RoleDetail> GetIzendaRoleByTenantAndName(Guid? tenantId, string roleName, string authToken)
         {
-            var tenants = await WebApiService.Instance.GetAsync<IList<TenantDetail>>("/tenant/allTenants", authToken);
-            if (tenants != null)
-                return tenants.FirstOrDefault(x => x.Name.Equals(tenantName, StringComparison.InvariantCultureIgnoreCase));
+            var roles = await WebAPIService.Instance.GetAsync<IList<RoleDetail>>("/role/all/" + (tenantId.HasValue ? tenantId.ToString() : null), authToken);
+
+            if (roles != null)
+                return roles.FirstOrDefault(r => r.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase));
 
             return null;
         }

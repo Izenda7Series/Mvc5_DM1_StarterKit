@@ -39,6 +39,9 @@ namespace Mvc5StarterKit.Models
         }
     }
 
+    /// <summary>
+    /// Client DB Tenant
+    /// </summary>
     public class Tenant
     {
         public int Id { get; set; }
@@ -48,12 +51,15 @@ namespace Mvc5StarterKit.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        #region Properties
+        public virtual IDbSet<Tenant> Tenants { get; set; }
+        #endregion
+
+        #region CTOR
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
-        {
-        }
-
-        public virtual IDbSet<Tenant> Tenants { get; set; }
+        { } 
+        #endregion
 
         public static ApplicationDbContext Create()
         {
