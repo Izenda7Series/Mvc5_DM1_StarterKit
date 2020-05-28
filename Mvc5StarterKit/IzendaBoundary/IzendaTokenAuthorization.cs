@@ -46,7 +46,6 @@ namespace Mvc5StarterKit.IzendaBoundary
             return user;
         }
 
-
         public static UserInfo DecryptIzendaAuthenticationMessage(string encryptedMessage)
         {
             var rsaPrivateKey = ConfigurationManager.AppSettings["RSAPrivateKey"];

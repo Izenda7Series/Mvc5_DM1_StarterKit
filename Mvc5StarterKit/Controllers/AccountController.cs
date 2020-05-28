@@ -118,7 +118,10 @@ namespace Mvc5StarterKit.Controllers
                 int? tenantId = null;
 
                 if (model.SelectedTenant != null)
+                {
                     tenantId = tenantManager.GetTenantByName(model.SelectedTenant).Id;
+                    model.IsAdmin = false;
+                }
 
                 var user = new ApplicationUser
                 {
