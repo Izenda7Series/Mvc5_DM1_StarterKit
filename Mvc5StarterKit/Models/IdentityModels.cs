@@ -44,9 +44,11 @@ namespace Mvc5StarterKit.Models
     /// </summary>
     public class Tenant
     {
+        #region Properties
         public int Id { get; set; }
 
-        public string Name { get; set; } 
+        public string Name { get; set; }  
+        #endregion
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -58,12 +60,14 @@ namespace Mvc5StarterKit.Models
         #region CTOR
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
-        { } 
+        { }
         #endregion
 
+        #region Methods
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
-        }
+        } 
+        #endregion
     }
 }

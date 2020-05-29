@@ -6,9 +6,11 @@ namespace Mvc5StarterKit
 {
     public partial class Startup
     {
+        #region Methods
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
-        }
+        } 
+        #endregion
     }
 }

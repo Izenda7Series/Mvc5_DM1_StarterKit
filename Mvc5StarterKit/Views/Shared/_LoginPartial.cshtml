@@ -8,9 +8,6 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li>
-                @*If manage account can be handled here, you can uncomment below line and customize it*@
-                @*@Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })*@
-
                 <a>Hello, @User.Identity.GetUserName()!</a>
             </li>
 
@@ -37,7 +34,6 @@
 else
 {
     <ul class="nav navbar-nav navbar-right">
-        @*<li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>*@
         <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
     </ul>
 }

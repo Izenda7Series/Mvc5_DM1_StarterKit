@@ -48,21 +48,12 @@
                             <input type="submit" value="Log in" class="btn btn-default" />
                         </div>
                     </div>
-
-                    //Register menu is commented out. If you want to implement Register here, please uncomment
-                    @*<p>
-                            @Html.ActionLink("Register as a new user", "Register")
-                        </p>*@
-                    @* Enable this once you have account confirmation enabled for password reset functionality
-                        <p>
-                            @Html.ActionLink("Forgot your password?", "ForgotPassword")
-                        </p>*@
                 }
             </section>
         </div>
         <div class="col-md-4">
             <section id="socialLoginForm">
-                @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                @Html.Partial("_ExternalLoginsListPartial")
             </section>
         </div>
     </div>

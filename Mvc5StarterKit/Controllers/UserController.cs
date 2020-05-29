@@ -5,6 +5,7 @@ namespace Mvc5StarterKit.Controllers
 {
     public class UserController : Controller
     {
+        #region Methods
         [HttpGet]
         [Authorize]
         public ActionResult GenerateToken()
@@ -16,7 +17,7 @@ namespace Mvc5StarterKit.Controllers
             var user = new Models.UserInfo { UserName = username, TenantUniqueName = tenantName };
             var token = IzendaBoundary.IzendaTokenAuthorization.GetToken(user);
             return Json(new { token = token }, JsonRequestBehavior.AllowGet);
-        }
-
+        } 
+        #endregion
     }
 }
