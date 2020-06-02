@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
 
@@ -15,7 +14,7 @@ namespace Mvc5StarterKit.Controllers
             dynamic filters = new System.Dynamic.ExpandoObject();
             foreach (string key in queryString.AllKeys)
             {
-                ((IDictionary<String, Object>)filters).Add(key, queryString[key]);
+                ((IDictionary<string, object>)filters).Add(key, queryString[key]);
             }
 
             ViewBag.Id = id;

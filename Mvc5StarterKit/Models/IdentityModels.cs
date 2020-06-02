@@ -13,6 +13,7 @@ namespace Mvc5StarterKit.Models
     {
         public int? Tenant_Id { get; set; }
         [ForeignKey("Tenant_Id")]
+
         public Tenant Tenant { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType = DefaultAuthenticationTypes.ApplicationCookie)
@@ -27,7 +28,9 @@ namespace Mvc5StarterKit.Models
                     new Claim("tenantId",Tenant.Id.ToString()),
                 });
             }
+
             var role = (await manager.GetRolesAsync(this.Id)).FirstOrDefault();
+          
             if(role !=null)
                 userIdentity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, role));
 
@@ -36,25 +39,35 @@ namespace Mvc5StarterKit.Models
         }
     }
 
+    /// <summary>
+    /// Client DB Tenant
+    /// </summary>
     public class Tenant
     {
+        #region Properties
         public int Id { get; set; }
 
-        public string Name { get; set; } 
+        public string Name { get; set; }  
+        #endregion
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        #region Properties
+        public virtual IDbSet<Tenant> Tenants { get; set; }
+        #endregion
+
+        #region CTOR
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
-        {
-        }
+        { }
+        #endregion
 
-        public virtual IDbSet<Tenant> Tenants { get; set; }
-
+        #region Methods
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
-        }
+        } 
+        #endregion
     }
 }

@@ -9,24 +9,24 @@ using System.Threading.Tasks;
 
 namespace Mvc5StarterKit.IzendaBoundary
 {
-    public class WebApiService
+    public class WebAPIService
     {
         #region Variables
         private readonly string _basedUri; 
-        private static WebApiService _instance;
+        private static WebAPIService _instance;
         #endregion
 
         #region CTOR
-        private WebApiService(string basedUri)
+        private WebAPIService(string basedUri)
         {
             _basedUri = basedUri;
         }
         #endregion
 
         #region Methods
-        public static WebApiService Instance
+        public static WebAPIService Instance
         {
-            get { return _instance ?? (_instance = new WebApiService(System.Configuration.ConfigurationManager.AppSettings["IzendaApiUrl"])); }
+            get { return _instance ?? (_instance = new WebAPIService(System.Configuration.ConfigurationManager.AppSettings["IzendaApiUrl"])); }
         }
 
         public async Task<T> GetAsync<T>(string action, string authToken = null, Dictionary<string, object> parameters = null)

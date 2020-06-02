@@ -12,20 +12,6 @@ namespace Mvc5StarterKit.Controllers
         {
             return View();
         }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        } 
         #endregion
 
         #region Izenda Actions
@@ -79,7 +65,7 @@ namespace Mvc5StarterKit.Controllers
             dynamic filters = new System.Dynamic.ExpandoObject();
             foreach (string key in queryString.AllKeys)
             {
-                ((IDictionary<String, Object>)filters).Add(key, queryString[key]);
+                ((IDictionary<string, object>)filters).Add(key, queryString[key]);
             }
 
             ViewBag.Id = id;

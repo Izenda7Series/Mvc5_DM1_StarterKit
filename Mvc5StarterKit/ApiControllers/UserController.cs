@@ -7,6 +7,7 @@ namespace Mvc5StarterKit.ApiControllers
     [RoutePrefix("api/User")]
     public class UserController : ApiController
     {
+        #region Methods
         [HttpGet]
         [Route("GenerateToken")]
         //This is used for exporting only
@@ -18,6 +19,7 @@ namespace Mvc5StarterKit.ApiControllers
             var token = IzendaBoundary.IzendaTokenAuthorization.GetToken(user);
 
             return token;
-        }
+        } 
+        #endregion
     }
 }
