@@ -270,6 +270,8 @@
     <Content Include="Views\Home\IframeViewer.cshtml" />
     <Content Include="Views\Account\CreateTenant.cshtml" />
     <Content Include="Views\Account\CreateUser.cshtml" />
+    <Content Include="Views\Report\ReportCustomFilterViewer.cshtml" />
+    <Content Include="Views\Report\AdvancedReportParts.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\izenda\" />

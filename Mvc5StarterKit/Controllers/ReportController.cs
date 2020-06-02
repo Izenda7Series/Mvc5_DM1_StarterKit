@@ -25,6 +25,16 @@ namespace Mvc5StarterKit.Controllers
         {
             return View();
         }
+
+        public ActionResult ReportCustomFilterViewer()
+        {
+            return View();
+        }
+
+        public ActionResult AdvancedReportParts()
+        {
+            return View();
+        }
         #endregion
     }
 }
