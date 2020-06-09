@@ -31,6 +31,9 @@ namespace Mvc5StarterKit.Models
         [Display(Name = "Selected Tenant")]
         public string SelectedTenant { get; set; }
 
+        [Display(Name = "Seleted Role")]
+        public string SelectedRole { get; set; }
+
         [Display(Name = "Is Admin")]
         public bool IsAdmin { get; set; }
 

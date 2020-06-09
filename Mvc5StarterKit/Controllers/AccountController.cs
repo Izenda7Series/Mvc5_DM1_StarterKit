@@ -3,9 +3,12 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Mvc5StarterKit.IzendaBoundary;
 using Mvc5StarterKit.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using WebGrease.Css.Extensions;
 
 namespace Mvc5StarterKit.Controllers
 {
@@ -105,13 +108,18 @@ namespace Mvc5StarterKit.Controllers
         }
 
         // POST: /Account/CreateUser
+        /// <summary>
+        /// This example returns view that handles user creation to check values passed after submit. 
+        /// You can customize your result view showing simple success messages or failure message.
+        /// </summary>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl = null)
         {
+            var izendaAdminAuthToken = IzendaTokenAuthorization.GetIzendaAdminToken();
             model.Tenants = IzendaUtilities.GetAllTenants(); // prevent null exception when redirected
-            
+
             if (ModelState.IsValid)
             {
                 int? tenantId = null;
@@ -129,29 +137,27 @@ namespace Mvc5StarterKit.Controllers
                     Tenant_Id = tenantId,
                 };
 
-                var result = await UserManager.CreateAsync(user);
+                var result = await UserManager.CreateAsync(user); // Save new user into client DB
 
-                if (result.Succeeded)
+                if (result.Succeeded) // if successful, then start creating a user at Izenda DB
                 {
-                    var assignedRole = "Employee"; // set default role if required
+                    var assignedRole = model.SelectedRole ?? "Employee"; // set default role if required. As an example, Employee is set by default
 
-                    if (RoleManager.RoleExists(assignedRole))
+                    if (RoleManager.RoleExists(assignedRole)) // check assigned role exist in client DB. if not, assigned role is null
                         result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
-                    else
-                        assignedRole = null;
 
                     if (result.Succeeded)
                     {
-                        var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
-                        user.Tenant = IzendaUtilities.GetTenantByName(model.SelectedTenant);
+                        user.Tenant = IzendaUtilities.GetTenantByName(model.SelectedTenant); // set client DB application user's tenant
 
-                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(
+                        // Create a new user at Izenda DB
+                        var success = await IzendaUtilities.CreateIzendaUser(
                             model.SelectedTenant,
                             model.UserID,
                             model.LastName,
                             model.FirstName,
                             model.IsAdmin,
-                            assignedRole, 
+                            assignedRole,
                             izendaAdminAuthToken);
 
                         if (success)
@@ -231,6 +237,25 @@ namespace Mvc5StarterKit.Controllers
 
             // If we got this far, something failed, re-display form
             return FailedTenantCreateAction(model, _unknownFailureMessage);
+        }
+
+        /// <summary>
+        /// Get all roles from Izenda DB by selected tenant and return SelectedList for role selection dropdown list at view 
+        /// </summary>
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> GetRoleListByTenant(string selectedTenant)
+        {
+            var selectList = new List<string>();
+            var adminToken = IzendaTokenAuthorization.GetIzendaAdminToken();
+
+            var izendaTenant = await IzendaUtilities.GetIzendaTenantByName(selectedTenant, adminToken);
+            var roleDetailsByTenant = await IzendaUtilities.GetAllIzendaRoleByTenant(izendaTenant?.Id ?? null, IzendaTokenAuthorization.GetIzendaAdminToken());
+
+            roleDetailsByTenant.ForEach(r => selectList.Add(r.Name));
+
+            var itemList = selectList.Select(i => new SelectListItem { Text = i }).ToList();
+            return Json(new SelectList(itemList, "Value", "Text"));
         }
 
         private ActionResult FailedTenantCreateAction(CreateTenantViewModel model, string message)

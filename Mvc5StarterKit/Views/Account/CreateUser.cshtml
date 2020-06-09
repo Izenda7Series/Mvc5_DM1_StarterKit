@@ -1,6 +1,49 @@
 ﻿@using Mvc5StarterKit.Models
 @model CreateUserViewModel
 
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            SelectionChange();
+        });
+
+        function SelectionChange() {
+            var selectedTenant = $("#tenantList option:selected").val();
+
+            if (selectedTenant === "") {
+                $("#isAdminDiv").show();
+            }
+            else {
+                $("#isAdminDiv").hide();
+            }
+
+            var url = "GetRoleListByTenant";
+            $.ajax({
+                data:
+                {
+                    selectedTenant
+                },
+                type: 'POST',
+                cache: false,
+                dataType: 'json',
+                url: url,
+                success: function (result) {
+                    var options = result.map(function (el, i) {
+                        return $("<option></option>").val(el.Value).prop("selected", el.Selected).text(el.Text).val(el.Text);
+                    });
+                    $("#roleDropDown").html(options, "Value", "Text")
+                },
+                error: function () {
+                    alert("Can't retrieve role list");
+                }
+            });
+        }
+    </script>
+}
+
 <div class="container body-content">
     <h2>@ViewBag.Title</h2>
 
@@ -56,6 +99,14 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        @Html.LabelFor(m => m.SelectedRole, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            <div class="dropdown" id="roleList">
+                                @Html.DropDownListFor(m => m.SelectedRole, new SelectList(Enumerable.Empty<SelectListItem>()), "", new { @class = "form-control", id = "roleDropDown" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         @Html.LabelFor(m => m.UserID, new { @class = "col-md-2 control-label" })
                         <div class="col-md-10">
                             @Html.TextBoxFor(m => m.UserID, new { @class = "form-control" })
@@ -101,23 +152,3 @@
     </div>
 </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-
-    <script type="text/javascript">
-        function SelectionChange() {
-            var selectedTenant = $("#tenantList option:selected").val();
-
-            if (selectedTenant === "") {
-                $("#isAdminDiv").show();
-            }
-            else {
-                $("#isAdminDiv").hide();
-            }
-        }
-
-        $(document).ready(function () {
-            SelectionChange();
-        });
-    </script>
-}
