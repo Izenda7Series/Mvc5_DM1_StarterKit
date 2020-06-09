@@ -145,6 +145,8 @@ namespace Mvc5StarterKit.Controllers
 
                     if (RoleManager.RoleExists(assignedRole)) // check assigned role exist in client DB. if not, assigned role is null
                         result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
+                    else
+                        assignedRole = null;
 
                     if (result.Succeeded)
                     {
