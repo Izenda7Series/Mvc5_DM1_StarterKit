@@ -287,7 +287,7 @@ namespace Mvc5StarterKit.Controllers
             var adminToken = IzendaTokenAuthorization.GetIzendaAdminToken();
 
             var izendaTenant = await IzendaUtilities.GetIzendaTenantByName(selectedTenant, adminToken);
-            var roleDetailsByTenant = await IzendaUtilities.GetAllIzendaRoleByTenant(izendaTenant?.Id ?? null, IzendaTokenAuthorization.GetIzendaAdminToken());
+            var roleDetailsByTenant = await IzendaUtilities.GetAllIzendaRoleByTenant(izendaTenant?.Id ?? null, adminToken);
 
             roleDetailsByTenant.ForEach(r => selectList.Add(r.Name));
 

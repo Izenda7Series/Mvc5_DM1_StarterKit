@@ -1,10 +1,11 @@
 ﻿@using Mvc5StarterKit.Models
 @model CreateUserViewModel
 
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.js">
+    </script>
     <script type="text/javascript">
         $(document).ready(function () {
             SelectionChange();
@@ -20,6 +21,7 @@
                 $("#isAdminDiv").hide();
             }
 
+            $.blockUI({ message: "<h3> Retrieving role and tenant data now...</h3>" });
             var url = "GetRoleListByTenant";
             $.ajax({
                 data:
@@ -31,12 +33,14 @@
                 dataType: 'json',
                 url: url,
                 success: function (result) {
+                    $.unblockUI();
                     var options = result.map(function (el, i) {
                         return $("<option></option>").val(el.Value).prop("selected", el.Selected).text(el.Text).val(el.Text);
                     });
                     $("#roleDropDown").html(options, "Value", "Text")
                 },
                 error: function () {
+                    $.unblockUI();
                     alert("Can't retrieve role list");
                 }
             });
