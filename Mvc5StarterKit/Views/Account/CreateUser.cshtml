@@ -1,27 +1,60 @@
 ﻿@using Mvc5StarterKit.Models
 @model CreateUserViewModel
 
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.66.0-2013.10.09/jquery.blockUI.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            SelectionChange();
+        });
+
+        function SelectionChange() {
+            var selectedTenant = $("#tenantList option:selected").val();
+
+            if (selectedTenant === "") {
+                $("#isAdminDiv").show();
+            }
+            else {
+                $("#isAdminDiv").hide();
+            }
+
+            $.blockUI({ message: "<h3> Retrieving role and tenant data now...</h3>" });
+            var url = "GetRoleListByTenant";
+            $.ajax({
+                data:
+                {
+                    selectedTenant
+                },
+                type: 'POST',
+                cache: false,
+                dataType: 'json',
+                url: url,
+                success: function (result) {
+                    $.unblockUI();
+                    var options = result.map(function (el, i) {
+                        return $("<option></option>").val(el.Value).prop("selected", el.Selected).text(el.Text).val(el.Text);
+                    });
+                    $("#roleDropDown").html(options, "Value", "Text")
+                },
+                error: function () {
+                    $.unblockUI();
+                    alert("Can't retrieve role list");
+                }
+            });
+        }
+    </script>
+}
+
 <div class="container body-content">
     <h2>@ViewBag.Title</h2>
-
-    @if (TempData["WarningMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissable">
-            <strong>@TempData["WarningMessage"]</strong>
-        </div>
-    }
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissable">
-            <strong>@TempData["SuccessMessage"]</strong>
-        </div>
-    }
 
     <div class="row">
         <div class="col-md-8">
             <section id="CreateUserForm">
-                @using (Html.BeginForm("CreateUser", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                @using (Html.BeginForm("CreateUser", "Account", new { ReturnUrl = "/CreateUserSuccess" }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                 {
                     @Html.AntiForgeryToken()
 
@@ -52,6 +85,14 @@
                             <div class="checkbox" id="isAdminCheckBox">
                                 @Html.CheckBoxFor(m => m.IsAdmin)
                                 @Html.LabelFor(m => m.IsAdmin)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SelectedRole, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            <div class="dropdown" id="roleList">
+                                @Html.DropDownListFor(m => m.SelectedRole, new SelectList(Enumerable.Empty<SelectListItem>()), "", new { @class = "form-control", id = "roleDropDown" })
                             </div>
                         </div>
                     </div>
@@ -100,24 +141,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-
-    <script type="text/javascript">
-        function SelectionChange() {
-            var selectedTenant = $("#tenantList option:selected").val();
-
-            if (selectedTenant === "") {
-                $("#isAdminDiv").show();
-            }
-            else {
-                $("#isAdminDiv").hide();
-            }
-        }
-
-        $(document).ready(function () {
-            SelectionChange();
-        });
-    </script>
-}

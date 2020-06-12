@@ -3,9 +3,12 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Mvc5StarterKit.IzendaBoundary;
 using Mvc5StarterKit.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using WebGrease.Css.Extensions;
 
 namespace Mvc5StarterKit.Controllers
 {
@@ -105,13 +108,18 @@ namespace Mvc5StarterKit.Controllers
         }
 
         // POST: /Account/CreateUser
+        /// <summary>
+        /// This example returns view that handles user creation to check values passed after submit. 
+        /// You can customize your result view showing simple success messages or failure message.
+        /// </summary>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl = null)
+        public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl)
         {
+            var izendaAdminAuthToken = IzendaTokenAuthorization.GetIzendaAdminToken();
             model.Tenants = IzendaUtilities.GetAllTenants(); // prevent null exception when redirected
-            
+
             if (ModelState.IsValid)
             {
                 int? tenantId = null;
@@ -129,60 +137,73 @@ namespace Mvc5StarterKit.Controllers
                     Tenant_Id = tenantId,
                 };
 
-                var result = await UserManager.CreateAsync(user);
+                var result = await UserManager.CreateAsync(user); // Save new user into client DB
 
-                if (result.Succeeded)
+                if (result.Succeeded) // if successful, then start creating a user at Izenda DB
                 {
-                    var assignedRole = "Employee"; // set default role if required
+                    var assignedRole = model.SelectedRole ?? "Employee"; // set default role if required. As an example, Employee is set by default
 
-                    if (RoleManager.RoleExists(assignedRole))
+                    if (RoleManager.RoleExists(assignedRole)) // check assigned role exist in client DB. if not, assigned role is null
                         result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
                     else
                         assignedRole = null;
 
                     if (result.Succeeded)
                     {
-                        var izendaAdminAuthToken = IzendaBoundary.IzendaTokenAuthorization.GetIzendaAdminToken();
-                        user.Tenant = IzendaUtilities.GetTenantByName(model.SelectedTenant);
+                        user.Tenant = IzendaUtilities.GetTenantByName(model.SelectedTenant); // set client DB application user's tenant
 
-                        var success = await IzendaBoundary.IzendaUtilities.CreateIzendaUser(
+                        // Create a new user at Izenda DB
+                        var success = await IzendaUtilities.CreateIzendaUser(
                             model.SelectedTenant,
                             model.UserID,
                             model.LastName,
                             model.FirstName,
                             model.IsAdmin,
-                            assignedRole, 
+                            assignedRole,
                             izendaAdminAuthToken);
 
                         if (success)
-                        {
-                            TempData["SuccessMessage"] = "User has been created successfully";
-                            return View(model);
-                        }
+                            return RedirectToAction(returnUrl);
                         else
-                            FailedUserCreateAction(model, _unknownFailureMessage);
+                            FailedUserCreateAction(_unknownFailureMessage);
                     }
                 }
                 else
-                    FailedUserCreateAction(model, _defaultUserFailureMessage);
+                    FailedUserCreateAction(_defaultUserFailureMessage);
 
                 AddErrors(result);
             }
 
-            return FailedUserCreateAction(model, _defaultUserFailureMessage);
+            return FailedUserCreateAction(_defaultUserFailureMessage);
         }
 
-        private ActionResult FailedUserCreateAction(CreateUserViewModel model, string message)
+        private ActionResult FailedUserCreateAction(string message)
         {
             TempData["WarningMessage"] = message;
-            return View(model);
+
+            return RedirectToAction("FailedToCreateUser", "Account");
+        }
+
+        public ViewResult CreateUserSuccess()
+        {
+            // You can customize your ViewResult, we just display success message here
+            ViewBag.Title = "Create User Success";
+
+            return View();
+        }
+
+        public ViewResult FailedToCreateUser()
+        {
+            // You can customize your ViewResult, we just display success message here
+            ViewBag.Title = "Create User Failure";
+
+            return View();
         }
 
         // GET: /Account/CreateUser
         [AllowAnonymous]
         public ActionResult CreateUser()
         {
-            ViewBag.ReturnUrl = null;
             ViewBag.Title = "Create User";
 
             var createUserViewModel = new CreateUserViewModel();
@@ -197,7 +218,7 @@ namespace Mvc5StarterKit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateTenant(CreateTenantViewModel model, string returnUrl = null)
+        public async Task<ActionResult> CreateTenant(CreateTenantViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -217,33 +238,67 @@ namespace Mvc5StarterKit.Controllers
                         var newTenant = new Tenant() { Name = tenantName };
                         await IzendaUtilities.SaveTenantAsync(newTenant);
 
-                        TempData["SuccessMessage"] = "Tenant has been created successfully";
-                        return View(model);
+                        return RedirectToAction(returnUrl);
                     }
                     else
                         // Izenda DB has the same tenant name. Display Message at CreateTenant.cshtml
-                        return FailedTenantCreateAction(model, _defaultTenantFailureMessage);
+                        return FailedTenantCreateAction(_defaultTenantFailureMessage);
                 }
                 else
                     // user DB has the same tenant name. Display Message at CreateTenant.cshtml
-                    return FailedTenantCreateAction(model, _defaultTenantFailureMessage);
+                    return FailedTenantCreateAction(_defaultTenantFailureMessage);
             }
 
-            // If we got this far, something failed, re-display form
-            return FailedTenantCreateAction(model, _unknownFailureMessage);
+            // If we got this far, something failed
+            return FailedTenantCreateAction(_unknownFailureMessage);
         }
 
-        private ActionResult FailedTenantCreateAction(CreateTenantViewModel model, string message)
+        private ActionResult FailedTenantCreateAction(string message)
         {
-            TempData["WarningMessage"] = message;
-            return View(model);
+            TempData["WarningMessage"] = message; // custom message passed
+
+            return RedirectToAction("FailedToCreateTenant", "Account");
+        }
+
+        public ViewResult CreateTenantSuccess()
+        {
+            // You can customize your ViewResult, we just display success message here
+            ViewBag.Title = "Create Tenant Success";
+
+            return View();
+        }
+
+        public ViewResult FailedToCreateTenant()
+        {
+            // You can customize your ViewResult, we just display success message here
+            ViewBag.Title = "Create Tenant Failure";
+
+            return View();
+        }
+
+        /// <summary>
+        /// Get all roles from Izenda DB by selected tenant and return SelectedList for role selection dropdown list at view 
+        /// </summary>
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> GetRoleListByTenant(string selectedTenant)
+        {
+            var selectList = new List<string>();
+            var adminToken = IzendaTokenAuthorization.GetIzendaAdminToken();
+
+            var izendaTenant = await IzendaUtilities.GetIzendaTenantByName(selectedTenant, adminToken);
+            var roleDetailsByTenant = await IzendaUtilities.GetAllIzendaRoleByTenant(izendaTenant?.Id ?? null, adminToken);
+
+            roleDetailsByTenant.ForEach(r => selectList.Add(r.Name));
+
+            var itemList = selectList.Select(i => new SelectListItem { Text = i }).ToList();
+            return Json(new SelectList(itemList, "Value", "Text"));
         }
 
         // GET: /Account/CreateUser
         [AllowAnonymous]
         public ActionResult CreateTenant()
         {
-            ViewBag.ReturnUrl = null;
             ViewBag.Title = "Create Tenant";
 
             return View();

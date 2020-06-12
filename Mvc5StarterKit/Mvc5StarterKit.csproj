@@ -266,6 +266,10 @@
     <Content Include="Views\Shared\Izenda_Layout.cshtml" />
     <Content Include="Views\Home\ReportPart.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
+    <Content Include="Views\Account\CreateUserSuccess.cshtml" />
+    <Content Include="Views\Account\CreateTenantSuccess.cshtml" />
+    <Content Include="Views\Account\FailedToCreateTenant.cshtml" />
+    <Content Include="Views\Account\FailedToCreateUser.cshtml" />
     <None Include="Views\Dashboard\DashboardViewer.cshtml" />
     <Content Include="Views\Home\IframeViewer.cshtml" />
     <Content Include="Views\Account\CreateTenant.cshtml" />
