@@ -20,8 +20,8 @@ namespace Mvc5StarterKit.Controllers
         private ApplicationUserManager _userManager;
         private ApplicationRoleManager _roleManager;
 
-        private static readonly string _defaultTenantFailureMessage = "Can't creat a new tenant. The tenant name or id already exists.";
-        private static readonly string _defaultUserFailureMessage = "Can't create a new user. The user name or id already exists.";
+        private static readonly string _defaultTenantFailureMessage = "Can't create a new tenant.";
+        private static readonly string _defaultUserFailureMessage = "Can't create a new user.";
         private static readonly string _unknownFailureMessage = "Server does not allow your request.";
         #endregion
 
