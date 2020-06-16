@@ -137,8 +137,7 @@ namespace Mvc5StarterKit.IzendaBoundary
                 FirstName = firstName,
                 TenantDisplayId = izendaTenant != null ? izendaTenant.Name : string.Empty,
                 InitPassword = false,
-                SystemAdmin = isAdmin,
-                Active = true
+                SystemAdmin = isAdmin
             };
 
             if (!string.IsNullOrWhiteSpace(roleName))
