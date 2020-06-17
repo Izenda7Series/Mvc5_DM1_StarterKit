@@ -7,6 +7,7 @@ using Mvc5StarterKit.Models;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Mvc5StarterKit
@@ -104,6 +105,11 @@ namespace Mvc5StarterKit
             }
 
             return false;
+        }
+
+        public override Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
+        {
+            return user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager);
         }
 
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)

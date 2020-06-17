@@ -3,7 +3,9 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Mvc5StarterKit.IzendaBoundary;
 using Mvc5StarterKit.Models;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -141,12 +143,20 @@ namespace Mvc5StarterKit.Controllers
 
                 if (result.Succeeded) // if successful, then start creating a user at Izenda DB
                 {
-                    var assignedRole = model.SelectedRole ?? "Employee"; // set default role if required. As an example, Employee is set by default
+                    var assignedRole = !string.IsNullOrEmpty(model.SelectedRole) ? model.SelectedRole : "Employee";// set default role if required. As an example, Employee is set by default
 
-                    if (RoleManager.RoleExists(assignedRole)) // check assigned role exist in client DB. if not, assigned role is null
-                        result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
-                    else
-                        assignedRole = null;
+                    if (!RoleManager.RoleExists(assignedRole)) // check assigned role exist in client DB. if not, assigned role is null
+                    {
+                        try
+                        {
+                            await RoleManager.CreateAsync(new Microsoft.AspNet.Identity.EntityFramework.IdentityRole(assignedRole));
+                            result = await UserManager.AddToRoleAsync(user.Id, assignedRole);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.WriteLine(e);
+                        }
+                    }
 
                     if (result.Succeeded)
                     {
