@@ -245,7 +245,7 @@ namespace Mvc5StarterKit.Controllers
                     if (success)
                     {
                         // save a new tenant at user DB
-                        var newTenant = new Tenant() { Name = tenantName };
+                        var newTenant = new Tenant() { Name = model.TenantID };
                         await IzendaUtilities.SaveTenantAsync(newTenant);
 
                         return RedirectToAction(returnUrl);
