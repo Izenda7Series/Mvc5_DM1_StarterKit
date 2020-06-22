@@ -270,7 +270,7 @@
     <Content Include="Views\Account\CreateTenantSuccess.cshtml" />
     <Content Include="Views\Account\FailedToCreateTenant.cshtml" />
     <Content Include="Views\Account\FailedToCreateUser.cshtml" />
-    <None Include="Views\Dashboard\DashboardViewer.cshtml" />
+    <Content Include="Views\Dashboard\DashboardViewer.cshtml" />
     <Content Include="Views\Home\IframeViewer.cshtml" />
     <Content Include="Views\Account\CreateTenant.cshtml" />
     <Content Include="Views\Account\CreateUser.cshtml" />
