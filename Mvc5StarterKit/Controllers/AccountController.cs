@@ -99,9 +99,11 @@ namespace Mvc5StarterKit.Controllers
             }
 
             bool result;
-            var useADlogin = ConfigurationManager.AppSettings["useADlogin"];
+            bool useADlogin;
+            var adLoginSetting = ConfigurationManager.AppSettings["useADlogin"];
+            bool.TryParse(adLoginSetting, out useADlogin);
 
-            if (useADlogin.Equals("true") && !string.IsNullOrEmpty(model.Tenant)) // if tenant is null, then assume that it is system level login. Go to the ValidateLogin which is used for regular login process first
+            if (useADlogin && !string.IsNullOrEmpty(model.Tenant)) // if tenant is null, then assume that it is system level login. Go to the ValidateLogin which is used for regular login process first
             {
                 result = await SignInManager.ADSigninAsync(model.Tenant, model.Password, model.RememberMe);
             }
