@@ -198,7 +198,7 @@ namespace Mvc5StarterKit
                     if (userPrincipal.IsAccountLockedOut())
                         return false;
 
-                    if (userPrincipal.Enabled.HasValue && userPrincipal.Enabled.Value == false)
+                    if (userPrincipal.Enabled.HasValue && !userPrincipal.Enabled.Value)
                         return false;
                 }
             }
