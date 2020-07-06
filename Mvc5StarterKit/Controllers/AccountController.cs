@@ -5,6 +5,7 @@ using Mvc5StarterKit.IzendaBoundary;
 using Mvc5StarterKit.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -97,9 +98,20 @@ namespace Mvc5StarterKit.Controllers
                 return View(model);
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSigninAsync(model.Tenant, model.Email, model.Password, model.RememberMe);
+            bool result;
+            var useADlogin = ConfigurationManager.AppSettings["useADlogin"];
+
+            if (useADlogin.Equals("true") && !string.IsNullOrEmpty(model.Tenant)) // if tenant is null, then assume that it is system level login. Go to the ValidateLogin which is used for regular login process first
+            {
+                result = await SignInManager.ADSigninAsync(model.Tenant, model.Password, model.RememberMe);
+            }
+            else
+            { 
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, change to shouldLockout: true
+                result = await SignInManager.PasswordSigninAsync(model.Tenant, model.Email, model.Password, model.RememberMe);
+            }
+
             if (result)
                 return RedirectToLocal(returnUrl);
             else
