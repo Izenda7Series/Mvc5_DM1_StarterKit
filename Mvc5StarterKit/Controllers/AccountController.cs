@@ -99,8 +99,7 @@ namespace Mvc5StarterKit.Controllers
             }
 
             bool result;
-            bool useADlogin;
-            bool.TryParse(ConfigurationManager.AppSettings["useADlogin"], out useADlogin);
+            bool.TryParse(ConfigurationManager.AppSettings["useADlogin"], out bool useADlogin);
 
             if (useADlogin && !string.IsNullOrEmpty(model.Tenant)) // if tenant is null, then assume that it is system level login. Go to the ValidateLogin which is used for regular login process first
             {
