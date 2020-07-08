@@ -8,6 +8,7 @@ namespace Mvc5StarterKit.Controllers
     public class HomeController : Controller
     {
         #region Base Actions
+        [AllowAnonymous]
         public ActionResult Index()
         {
             return View();
@@ -27,31 +28,37 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult Settings()
         {
             return View();
         }
 
+        [Authorize]
         public ActionResult Reports()
         {
             return View();
         }
 
+        [Authorize]
         public ActionResult ReportDesigner()
         {
             return View();
         }
 
+        [Authorize]
         public ActionResult Dashboards()
         {
             return View();
         }
 
+        [Authorize]
         public ActionResult DashboardDesigner()
         {
             return View();
         }
 
+        [Authorize]
         public ActionResult ReportPart(Guid id, string token)
         {
             ViewBag.Id = id;
@@ -59,6 +66,7 @@ namespace Mvc5StarterKit.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult IframeViewer(string id)
         {
             var queryString = Request.QueryString;
