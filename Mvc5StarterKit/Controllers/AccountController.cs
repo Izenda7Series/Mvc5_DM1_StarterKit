@@ -127,6 +127,7 @@ namespace Mvc5StarterKit.Controllers
         /// You can customize your result view showing simple success messages or failure message.
         /// </summary>
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateUser(CreateUserViewModel model, string returnUrl)
         {
@@ -222,6 +223,7 @@ namespace Mvc5StarterKit.Controllers
         }
 
         // GET: /Account/CreateUser
+        [Authorize]
         public ActionResult CreateUser()
         {
             ViewBag.Title = "Create User";
@@ -236,6 +238,7 @@ namespace Mvc5StarterKit.Controllers
 
         // POST: /Account/CreateTenant
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateTenant(CreateTenantViewModel model, string returnUrl)
         {
@@ -299,6 +302,7 @@ namespace Mvc5StarterKit.Controllers
         /// Get all roles from Izenda DB by selected tenant and return SelectedList for role selection dropdown list at view 
         /// </summary>
         [HttpPost]
+        [Authorize]
         public async Task<JsonResult> GetRoleListByTenant(string selectedTenant)
         {
             var selectList = new List<string>();
@@ -314,6 +318,7 @@ namespace Mvc5StarterKit.Controllers
         }
 
         // GET: /Account/CreateUser
+        [Authorize]
         public ActionResult CreateTenant()
         {
             ViewBag.Title = "Create Tenant";

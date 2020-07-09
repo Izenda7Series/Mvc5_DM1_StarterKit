@@ -8,7 +8,6 @@ namespace Mvc5StarterKit.Controllers
     public class HomeController : Controller
     {
         #region Base Actions
-        [AllowAnonymous]
         public ActionResult Index()
         {
             return View();
