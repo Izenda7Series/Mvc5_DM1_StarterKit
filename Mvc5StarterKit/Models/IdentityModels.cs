@@ -29,7 +29,7 @@ namespace Mvc5StarterKit.Models
                 });
             }
 
-            var role = (await manager.GetRolesAsync(this.Id)).FirstOrDefault();
+            var role = (await manager.GetRolesAsync(Id)).FirstOrDefault();
           
             if(role !=null)
                 userIdentity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, role));

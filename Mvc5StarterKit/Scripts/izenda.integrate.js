@@ -88,23 +88,6 @@ var izendaInitSetting = function () {
     this.DoRender(successFunc);
 };
 
-//var izendaInitReportPart = function () {
-//
-//    function successFunc(data, status) {
-//        console.info(data);
-//        var currentUserContext = {
-//            token: data.token
-//        };
-//
-//        IzendaSynergy.setCurrentUserContext(currentUserContext);
-//        IzendaSynergy.renderReportPart(document.getElementById('izenda-part1'), {
-//            "id": "804B35C8-44A4-4535-A484-F27E8ABA410D"
-//        });
-//    }
-//
-//    this.DoRender(successFunc);
-//};
-
 var izendaInitReportPart = function (reportParts) {
 
     function successFunc(data, status) {

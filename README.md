@@ -1,4 +1,3 @@
-
 # Izenda Mvc5Starterkit (Back-end Standalone)
 
  
@@ -10,30 +9,31 @@ This Starterkit showcases how to embed the front-end of Izenda into a MVC5 appli
 ### A. This is a simple example using a Visual Studio project template with Izenda Embedded into it. This repository is only an example of integrating Izenda into another application. The Visual Studio project template used in this scenario is used as a substitute for your application. This repository shows examples of how you might embed Izenda into your application.
 
  :warning: The MVC Kit is designed for demonstration purposes and should not be used as an “as-is” fully-integrated solution. You can use the kit for reference or a baseline but ensure that security and customization meet the standards of your company.
- 
- :warning: This deployment is currently using version 3.8.4. If you wish to update to a later version, ensure that you run the appropriate schema migration scripts.
 
 ### Deploying the standalone API and Izenda Configuration Database
 
-- Download and deploy the <a href="https://downloads.izenda.com/v3.8.4/API_AspNet.zip">Izenda API</a> to IIS.
+- Visit  <a href="https://downloads.izenda.com/">Izenda resource site</a> and download / deploy the Izenda API to IIS. You need to create an API folder in your IIS and paste all Izenda API contents into that folder.
 
-- Run the Mvc5StarterKit/DBScript/mvc5_izenda.sql to create a database named 'MVC5_Izenda' (This is the database for the Izenda configuration. It contains report definitions, dashboards,etc.). You may use any name of your choosing, just be sure to modify the script to USE the new database name.
+- Run the mvc5_izenda.sql under the DBScript folder to create a database named 'MVC5_Izenda' (This is the database for the Izenda configuration. It contains report definitions, dashboards,etc.). You may use any name of your choosing, just be sure to modify the script to USE the new database name.
 
-- Download a copy of the <a href="https://github.com/Izenda7Series/Mvc5StarterKit/blob/master/Mvc5StarterKit/izendadb.config">izendadb.config</a> file, and copy it to the root of your API deployment. Then modify the file with a valid connection string to this new database. If the connection string contains a ‘/’, ensure that you escape it ‘//’
+- Create a izendadb.config with inserting following line :
+{"ServerTypeId":"572bd576-8c92-4901-ab2a-b16e38144813","ServerTypeName":"[MSSQL] SQLServer","ConnectionString":"[YOUR CONNECTION STRING]","ConnectionId":"00000000-0000-0000-0000-000000000000"}
+You need to update your ConnectionString. If the connection string contains a ‘/’, ensure that you escape it ‘//’
+The ServerTypeId and ServerTypeName can be updated too based on your database type. For more information, please refer to <a href="https://www.izenda.com/docs/ref/api_systemdb_and_license.html#get-databasesetup-supporteddatabasetype">this</a>.
+
+- Insert izendadb.config file into the root of your API deployment. 
 
 - In the IzendaSystemSettings table, update AuthValidateAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/account/validateIzendaAuthToken --> http://localhost:14809/api/account/validateIzendaAuthToken
 
-- In the IzendaSystemSettings table, update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/getAccessToken --> http://localhost:14809/api/GetIzendaAccessToken
+- In the IzendaSystemSettings table, update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/account/getAccessToken --> http://localhost:14809/api/account/GetIzendaAccessToken
 
 ### Deploying the MVC Starter Kit Database
 
-- Run the Mvc5StarterKit/DBScript/mvc5.sql to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to USE the new database name.
+- Run the mvc5.sql under the DBScript folder to create a database named 'mvc5'. This is the database for the .NET application. It contains the users, roles, tenants used to login. You may use any name of your choosing, just be sure to modify the script to USE the new database name.
 
 ### Deploying the Retail Database (optional)
 
-Create the Retail database with the <a  href="https://github.com/Izenda7Series/Angular2Starterkit/blob/master/DbScript/RetailDbScript.sql">RetailDbScript.sql</a> file.
-
- 
+Create the Retail database with the retail.sql file under the DBScript folder.
 
 ### Deploying the MVC Kit
 
@@ -47,7 +47,7 @@ Web.Config
 
 - Update the IzendaApiUrl to point to the port of your Izenda API.
 
-Download the <a href="https://downloads.izenda.com/v3.8.4/EmbeddedUI.zip">Izenda Embedded UI</a>, and copy/store the files into the Scripts/izenda folder.
+Create a izenda folder under the Scripts. Download the Izenda Embedded UI from <a href="https://downloads.izenda.com/">Izenda resource site</a>, and copy/store the files into the Scripts/izenda folder.
 
 ### Update RSA Keys
 
@@ -157,7 +157,7 @@ Examples:
 | Name                       | Value                                                     | 
 | -------------------------- |:----------------------------------------------------------|
 | AuthValidateAccessTokenUrl |http://localhost:14809/api/account/validateIzendaAuthToken |
-| AuthGetAccessTokenUrl      |http://localhost:14809/api/GetIzendaAccessToken            |
+| AuthGetAccessTokenUrl      |http://localhost:14809/api/account/GetIzendaAccessToken            |
 
 </br>
 
