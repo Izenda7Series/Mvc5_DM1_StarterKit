@@ -1,5 +1,3 @@
-
-
 # Izenda Mvc5Starterkit (Back-end Standalone)
 
  
