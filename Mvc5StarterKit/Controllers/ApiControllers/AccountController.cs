@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 
-namespace Mvc5StarterKit.ApiControllers
+namespace Mvc5StarterKit.Controllers.ApiControllers
 {
     [RoutePrefix("api/account")]
     public class AccountController : ApiController
@@ -40,14 +40,23 @@ namespace Mvc5StarterKit.ApiControllers
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Route for AuthValidateAccessTokenUrl from Izenda configuration database.
+        /// </summary>
+        /// <param name="access_token">Access token to validate</param>
+        /// <returns>Deserialized UserInfo from token</returns>
         [HttpGet]
         [Route("validateIzendaAuthToken")]
         public UserInfo ValidateIzendaAuthToken(string access_token)
         {
-            var userInfo = IzendaBoundary.IzendaTokenAuthorization.GetUserInfo(access_token);
-            return userInfo;
+            return IzendaBoundary.IzendaTokenAuthorization.GetUserInfo(access_token);
         }
 
+        /// <summary>
+        /// Route for AuthGetAccessTokenUrl from Izenda configuration database.
+        /// </summary>
+        /// <param name="message">RSA encrypted message from schedules/subscriptions</param>
+        /// <returns>Token containing UserInfo</returns>
         [HttpGet]
         [AllowAnonymous]
         [Route("GetIzendaAccessToken")]
