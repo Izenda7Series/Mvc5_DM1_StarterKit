@@ -23,6 +23,8 @@ The ServerTypeId and ServerTypeName can be updated too based on your database ty
 
 - Insert izendadb.config file into the root of your API deployment. 
 
+- Check mvc5_izenda database version and update it if migration required <a href="https://tools.izenda.com/">Izenda Migration Assistant</a> 
+
 - In the IzendaSystemSettings table, update AuthValidateAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/account/validateIzendaAuthToken --> http://localhost:14809/api/account/validateIzendaAuthToken
 
 - In the IzendaSystemSettings table, update AuthGetAccessTokenUrl to be fully qualified with the Starterkit's base address. e.g. api/account/getAccessToken --> http://localhost:14809/api/account/GetIzendaAccessToken
