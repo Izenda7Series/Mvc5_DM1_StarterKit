@@ -274,3 +274,15 @@ var izendaInitReportPartExportViewer = function (reportPartId, token) {
         useHash: false
     });
 };
+
+var izendaInitRenderExportManagerPage = function () {
+    function successFunc(data, status) {
+        var currentUserContext = {
+            token: data.token
+        };
+
+        IzendaSynergy.setCurrentUserContext(currentUserContext);
+        IzendaSynergy.renderExportManagerPage(document.getElementById('izenda-root'));
+    }
+    this.DoRender(successFunc);
+};

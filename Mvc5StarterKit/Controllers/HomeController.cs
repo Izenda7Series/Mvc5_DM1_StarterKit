@@ -72,6 +72,12 @@ namespace Mvc5StarterKit.Controllers
             ViewBag.overridingFilterQueries = JsonConvert.SerializeObject(filters);
             return View();
         }
+
+        [Route("izenda/myprofile")]
+        public ActionResult ExportManager()
+        {
+            return View();
+        }
         #endregion
     }
 }

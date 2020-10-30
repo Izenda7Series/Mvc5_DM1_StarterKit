@@ -278,6 +278,7 @@
     <Content Include="Views\Account\CreateUser.cshtml" />
     <Content Include="Views\Report\ReportCustomFilterViewer.cshtml" />
     <Content Include="Views\Report\AdvancedReportParts.cshtml" />
+    <Content Include="Views\Home\ExportManager.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\izenda\" />
