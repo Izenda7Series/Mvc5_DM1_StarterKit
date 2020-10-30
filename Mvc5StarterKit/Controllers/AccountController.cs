@@ -330,6 +330,11 @@ namespace Mvc5StarterKit.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public ActionResult Unauthorized()
+        {
+            return View();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

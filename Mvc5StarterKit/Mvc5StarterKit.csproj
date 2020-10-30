@@ -279,6 +279,7 @@
     <Content Include="Views\Report\ReportCustomFilterViewer.cshtml" />
     <Content Include="Views\Report\AdvancedReportParts.cshtml" />
     <Content Include="Views\Home\ExportManager.cshtml" />
+    <Content Include="Views\Account\Unauthorized.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\izenda\" />
