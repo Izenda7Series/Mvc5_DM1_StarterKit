@@ -14,6 +14,7 @@
             "ReportViewerPopup": "reportviewerpopup",
             "Viewer": "viewer"
         },
+        "OnReceiveUnauthorizedResponse": redirectToUnauthorizedResponsePage,
         "Timeout": 3600
     };
     IzendaSynergy.config(configJson);
@@ -21,14 +22,18 @@
 };
 
 function errorFunc() {
-    alert('Token was not generated correctly. Please login.');
-
     // confirm dialog
     alertify.confirm("Your token was not generated correctly, please login.", function () {
         // user clicked "ok"
+        window.location.href = "/Account/Login";
     }, function() {
         // user clicked "cancel"
+        window.location.href = "/";
     });
+}
+
+function redirectToUnauthorizedResponsePage() {
+     window.location.href = "/Account/Unauthorized";
 }
 
 var DoRender = function (successFunc) {
